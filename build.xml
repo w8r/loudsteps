@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="geocoding" basedir="." default="main">
+	<property file="build.properties" />
+	<target name="start">
+		<echo message="Starting build..." />
+		
+	</target>
+	<target name="synchro">
+		<echo message="Customize" />
+		<copy file="app/index.html" tofile="index.html" overwrite="true" />
+		<copy file="app/categories.json" tofile="categories.json" overwrite="true" />
+		<gzip src="categories.json" destfile="categories.json.gz" />
+		<replace file="index.html" token="{GMAPS_API}" value="${GOOGLE_MAPS_API}" />
+		<replace file="index.html" token="{4SQ_API}" value="${4SQ_API}" />
+		<replace file="index.html" token="{4SQ_API_SECRET}" value="${4SQ_API_SECRET}" />
+		<replace file="index.html" token="../" value="" />
+		<replace file="index.html" token="./" value="app/" />
+		
+		<echo message="Synchronizing to ${host}..." />
+		<scp todir="${user}:${pwd}@${host}:${path}" port="${port}" verbose="true" sftp="true" trust="true">
+			<fileset dir="${basedir}">
+				<include name="**/*.js" />
+				<include name="**/*.gz" />
+			    <include name="**/*.css" />
+		        <include name="**/*.html" />
+		        <modified />
+			</fileset>
+		</scp>
+		
+		<echo message="Done." />
+	</target>
+	<target name="main" depends="start,synchro" />
+</project>

@@ -1,0 +1,47 @@
+.clearfix {
+  *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.clearfix:after {
+  clear: both;
+}
+.hide-text {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.input-block-level {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#map {
+  width: 70%;
+  height: 100%;
+  display: block;
+  position: absolute;
+}
+#map img {
+  max-width: none;
+}
+#map label {
+  width: auto;
+  display: inline;
+}
+#settings {
+  width: 30%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
