@@ -224,7 +224,8 @@
         },
 
         renderCategories : function(categories) {
-            $('categories-filter').html(this.renderCategoriesRaw(categories));
+            
+            $('#categories-filter').html(this.renderCategoriesRaw(categories));
         },
 
         /**
