@@ -211,7 +211,7 @@
          * Binds controls together
          */
         bindEvents : function() {
-            event.on(this.source, 'categories_received', this.renderCategories
+            event.on(this.poiSource, 'categories_received', this.renderCategories
                             .bind(this))
             $('#explore-button').click(function() {
                 if (this.router.route) {
