@@ -1,10 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="geocoding" basedir="." default="main">
 	<property file="build.properties" />
+
+	<macrodef name="git">
+		<attribute name="command" />
+		<attribute name="options" default="" />
+		<attribute name="dir" default="" />
+		<attribute name="failerror" default="false" />
+		<element name="args" optional="true" />
+		<sequential>
+			<echo message="git dir @{dir}" />
+			<echo message="git @{command}" />
+			<exec executable="git" dir="@{dir}" failonerror="@{failerror}">
+				<arg line="@{command} @{options}" />
+				<args />
+			</exec>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="git-add">
+		<attribute name="file" />
+		<attribute name="dir" default="." />
+		<attribute name="options" default="" />
+		<attribute name="failerror" default="false" />
+		<sequential>
+			<git command="add" dir="@{dir}" options="@{options}" failerror="@{failerror}" >
+				<args>
+					<arg value="@{file}" />
+				</args>
+			</git>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="git-commit-with-message">
+			<attribute name="message" />
+			<attribute name="dir" default="." />
+			<attribute name="options" default="" />
+			<attribute name="failerror" default="false" />
+			<sequential>
+				<git command="commit" dir="@{dir}" options="@{options}" failerror="@{failerror}" >
+					<args>
+						<arg value="-m @{message}" />
+					</args>
+				</git>
+			</sequential>
+	</macrodef>
+
+	<macrodef name="git-push-to-branch">
+			<attribute name="branch" />
+			<attribute name="remoteRepositoryName" default="origin" />
+			<attribute name="dir" default="." />
+			<attribute name="options" default="" />
+			<attribute name="failerror" default="false" />
+			<sequential>
+				<git command="push" dir="@{dir}" options="@{options}" failerror="@{failerror}" >
+					<args>
+						<arg value="@{remoteRepositoryName}" />
+						<arg value="@{branch}" />
+					</args>
+				</git>
+		</sequential>
+	</macrodef>
+
 	<target name="start">
 		<echo message="Starting build..." />
-		
 	</target>
+	
 	<target name="synchro">
 		<echo message="Customize" />
 		<copy file="app/index.html" tofile="index.html" overwrite="true" />
@@ -15,18 +76,24 @@
 		<replace file="index.html" token="{4SQ_API_SECRET}" value="${4SQ_API_SECRET}" />
 		<replace file="index.html" token="../" value="" />
 		<replace file="index.html" token="./" value="app/" />
-		
+
 		<echo message="Synchronizing to ${host}..." />
 		<scp todir="${user}:${pwd}@${host}:${path}" port="${port}" verbose="true" sftp="true" trust="true">
 			<fileset dir="${basedir}">
 				<include name="**/*.js" />
 				<include name="**/*.gz" />
-			    <include name="**/*.css" />
-		        <include name="**/*.html" />
-		        <modified />
+				<include name="**/*.css" />
+				<include name="**/*.html" />
+				<modified />
 			</fileset>
 		</scp>
-		
+		<git-add file="." />
+		<tstamp>
+			<format property="timestamp" pattern="yyyy.MM.dd_HH-mm-ss" />
+		</tstamp>
+		<git-commit-with-message message="upload ${timestamp}"/>
+		<git-push-to-branch branch="gh-pages" />
+
 		<echo message="Done." />
 	</target>
 	<target name="main" depends="start,synchro" />
