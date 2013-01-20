@@ -302,8 +302,8 @@
                             preventSubmitOnEnter : true,
                             delimeters : [44, 188, 13],
                             backspace : [8],
-                            tagClass: 'label label-info genre-tag',
-                            tagCloseIcon: '&times'
+                            tagClass : 'label label-info genre-tag',
+                            tagCloseIcon : '&times'
                         });
             }.bind(this));
         },
@@ -409,8 +409,9 @@
                                 + '<input type="text" class="tagManager genres" '
                                 + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
-                                + 'data-genres="" autocomplete="off" />';
-                                
+                                + 'data-genres="" autocomplete="off" />'
+                                + '<span class="btn btn-mini"><i class="icon icon-tag"</span>';
+
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
                 }
