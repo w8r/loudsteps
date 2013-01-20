@@ -350,44 +350,44 @@
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/building/government_",
                 "suffix" : ".png"
-            },
-            "categories" : [{
-                "id" : "4bf58dd8d48988d12a941735",
-                "name" : "Capitol Building",
-                "pluralName" : "Capitol Buildings",
-                "shortName" : "Capital Building",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/building/government_capitolbuilding_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d12c941735",
-                "name" : "Fire Station",
-                "pluralName" : "Fire Stations",
-                "shortName" : "Fire Station",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/building/government_firestation_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d12d941735",
-                "name" : "Monument / Landmark",
-                "pluralName" : "Monuments / Landmarks",
-                "shortName" : "Landmark",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/building/government_monument_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d12e941735",
-                "name" : "Police Station",
-                "pluralName" : "Police Stations",
-                "shortName" : "Police Station",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/building/government_policestation_",
-                    "suffix" : ".png"
-                }
-            }]
+            }
+        }, {
+            "id" : "4bf58dd8d48988d12a941735",
+            "name" : "Capitol Building",
+            "pluralName" : "Capitol Buildings",
+            "shortName" : "Capital Building",
+            "icon" : {
+                "prefix" : "https://foursquare.com/img/categories_v2/building/government_capitolbuilding_",
+                "suffix" : ".png"
+            }
+        }, {
+            "id" : "4bf58dd8d48988d12c941735",
+            "name" : "Fire Station",
+            "pluralName" : "Fire Stations",
+            "shortName" : "Fire Station",
+            "icon" : {
+                "prefix" : "https://foursquare.com/img/categories_v2/building/government_firestation_",
+                "suffix" : ".png"
+            }
+        }, {
+            "id" : "4bf58dd8d48988d12d941735",
+            "name" : "Monument / Landmark",
+            "pluralName" : "Monuments / Landmarks",
+            "shortName" : "Landmark",
+            "icon" : {
+                "prefix" : "https://foursquare.com/img/categories_v2/building/government_monument_",
+                "suffix" : ".png"
+            }
+        }, {
+            "id" : "4bf58dd8d48988d12e941735",
+            "name" : "Police Station",
+            "pluralName" : "Police Stations",
+            "shortName" : "Police Station",
+            "icon" : {
+                "prefix" : "https://foursquare.com/img/categories_v2/building/government_policestation_",
+                "suffix" : ".png"
+            }
+
         }, {
             "id" : "4bf58dd8d48988d12f941735",
             "name" : "Library",
