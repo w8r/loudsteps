@@ -137,12 +137,12 @@
      * 
      * @class Foursquare
      **************************************************************************/
-    var Foursquare = function(router, map) {
+    var Foursquare = function(router, map, clientKey, secretKey) {
         this.router = router;
         this.map = map;
         this.client =
-                new FourSquareClient(FOURSQUARE_CLIENT_KEY,
-                        FOURSQUARE_SECRET_KEY, window.location.href, true);
+                new FourSquareClient(clientKey, secretKey,
+                        window.location.href, true);
         this.retrieveCategories();
     };
 
@@ -238,6 +238,17 @@
     };
 
     /***************************************************************************
+     * Echonest client wrapper
+     * 
+     * @class Echonest
+     **************************************************************************/
+    var Echonest = function(api_key) {
+        this.client = new EchoNest(api_key);
+    };
+
+    Echonest.prototype = {};
+
+    /***************************************************************************
      * Main app
      * 
      * @class App
@@ -261,7 +272,10 @@
          */
         initControllers : function() {
             this.router = new Router(this.map);
-            this.poiSource = new Foursquare(this.router, this.map);
+            this.poiSource =
+                    new Foursquare(this.router, this.map,
+                            FOURSQUARE_CLIENT_KEY, FOURSQUARE_SECRET_KEY);
+            this.dataSource = new Echonest(ECHONEST_API);
             this.bindEvents();
         },
 
