@@ -132,7 +132,37 @@
 
         drawTies : function() {
             if (this.map.controlPoints) {
+                var pts = this.map.controlPoints;
+                for (var i = 0, len = pts.length; i < len; i++) {
+
+                }
             }
+        },
+
+        getNearestRouteLeg : function(coords, route) {
+            var diff = Number.MAX_VALUE, tempDiff, from, to,
+                points = editor.poly.geometry.getVertices(),
+                markers = editor.markers;
+            /* loop through all sides, don't forget convex shape */
+            for (var i = 0, len = editor.markers.length; i < len; i++) {
+                var j = (i == (len - 1)) ? 0 : (i + 1);
+                var a = points[i],
+                    b = points[j];
+                // no temp vertex between two unrendered vertices
+                var markerOne = markers[i],
+                    markerTwo = markers[j];
+                if (markerOne.isRendered() || markerTwo.isRendered()) {
+                    tempDiff =
+                            Math.pointToLineDistance(coords.lng, coords.lat,
+                                    a.lng, a.lat, b.lng, b.lat, true);
+                    if (tempDiff < diff) {
+                        diff = tempDiff;
+                        from = i;
+                        to = j;
+                    }
+                }
+            }
+            return [from, to];
         }
 
     };
