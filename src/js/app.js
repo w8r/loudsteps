@@ -222,13 +222,6 @@
                             position : new google.maps.LatLng(poi.location.lat,
                                     poi.location.lng)
                         });
-                new google.maps.Marker({
-                            map : this.map,
-                            visible : true,
-                            title : poi.name,
-                            position : new google.maps.LatLng(poi.location.lat,
-                                    poi.location.lng)
-                        });
                 this.markers.push(marker);
             }
         },
