@@ -285,6 +285,7 @@ console.log(arguments);
              * @returns A collection object.
              */
             images : function(callback, options) {
+                options = options || {}
                 console.log(options, {
                             name : this.name
                         });
