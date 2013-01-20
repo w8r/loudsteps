@@ -12,7 +12,10 @@
         this.map = map;
         this.geocoder = new google.maps.DirectionsService();
         this.renderer = new google.maps.DirectionsRenderer({
-                    draggable : true
+                    draggable : true,
+                    polylineOptions : {
+                        strokeColor : '#11b6f7'
+                    }
                 });
         this.renderer.setMap(map);
         google.maps.event.addListener(this.renderer, 'directions_changed',
