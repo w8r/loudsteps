@@ -63,12 +63,6 @@
 #settings ul li .btn {
   vertical-align: top;
 }
-#settings ul li .btn-mini {
-  display: none;
-}
-#settings ul li:hover .btn-mini {
-  display: inline-block;
-}
 .genres {
   display: block;
   float: left;
