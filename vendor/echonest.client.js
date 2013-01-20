@@ -294,6 +294,18 @@
             },
 
             /**
+             * Gets genres list
+             */
+            list_genres : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'list_genres', function(response) {
+                            callback(new GenresCollection(response.getData()));
+                        });
+            },
+
+            /**
              * Get the new about an artist
              * 
              * @returns A collection object.
@@ -622,6 +634,16 @@
         };
         ImageCollection.prototype = new Collection();
         ImageCollection.prototype.constructor = ImageCollection;
+
+        /**
+         * Used to interact with a collection of images Inherits from Collection
+         */
+        var GenresCollection = function(data) {
+            this.data = data;
+            this.name = "genres";
+        };
+        GenresCollection.prototype = new Collection();
+        GenresCollection.prototype.constructor = GenresCollection;
 
         /**
          * Used to interact with a collection of news Inherits from Collection
