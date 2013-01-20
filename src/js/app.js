@@ -301,6 +301,8 @@
                 }
                 return $('<select class="genres-select">' + options
                         + '</select>');
+            } else {
+                return this.genresSelect || null;
             }
         },
 
