@@ -151,7 +151,7 @@
                         method : 'get',
                         type : 'json',
                         success : function(response) {
-                            this.categoriesCache = response;
+                            this.categoriesCache = response.response.categories;
                             event.fire(this, 'categories_received',
                                     [this.categoriesCache]);
                         }.bind(this)
