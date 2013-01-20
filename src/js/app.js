@@ -459,15 +459,15 @@
                 html +=
                         '<li>'
                                 + '<div class="pull-right">'
-                                + '<div></div><input type="text" class="tagManager genres hide" '
+                                + '<div class="tags"><span class="btn btn-mini"><i class="icon icon-tag">'
+                                + '</i></span></div><input type="text" class="tagManager genres hide" '
                                 + 'name="genres-'
                                 + category.id
                                 + '" data-provide="typeahead" '
                                 + 'data-genres="'
                                 + category.genres
                                 + '" autocomplete="off" />'
-                                + '<span class="btn btn-mini"><i class="icon icon-tag">'
-                                + '</i></span></div>'
+                                + '</div>'
                                 + '<label class="checkbox" for="category-checkbox-'
                                 + category.id
                                 + '"><input type="checkbox" id="category-checkbox-'
