@@ -104,7 +104,7 @@
     };
 
     var trimTag = function (tag) {
-      var txt = $.trim(tag);
+      var txt = tag;
 
       var l = txt.length;
       var t = 0;
