@@ -341,7 +341,7 @@
             $('#categories-filter .tagManager').each(function(input) {
                 input = $(input);
                 var container = input.previous(),
-                    trigger = input.next();
+                    trigger = input.parent().find('.tags .btn');
 
                 trigger.click(function() {
                             var btn = $(this),
