@@ -417,7 +417,7 @@
                                 + category.id
                                 + '" checked="true"> '
                                 + category.name
-                                + '</label><div class="input-append">'
+                                + '</label><div class="inline-control">'
                                 + '<div></div><input type="text" class="tagManager genres hide" '
                                 + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
