@@ -121,7 +121,7 @@
             var t = 0;
 
             for (var i = l - 1; i >= 0; i--) {
-                if (-1 == delimiters.indexOf(txt.charCodeAt(i)))
+                if (-1 == delimeters.indexOf(txt.charCodeAt(i)))
                     break;
                 t++;
             }
@@ -132,7 +132,7 @@
 
             // remove from head
             for (var i = 0; i < l; i++) {
-                if (-1 == delimiters.indexOf(txt.charCodeAt(i)))
+                if (-1 == delimeters.indexOf(txt.charCodeAt(i)))
                     break;
                 t++;
             }
