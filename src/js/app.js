@@ -214,7 +214,7 @@
         bindEvents : function() {
             event.on(this.poiSource, 'categories_received', this.renderCategories
                             .bind(this));
-                            console.log('evt listener added');
+            console.log('evt listener added');
             $('#explore-button').click(function() {
                 if (this.router.route) {
                     this.poiSource.explore(this.router.route.bounds, null,
@@ -226,6 +226,7 @@
         },
 
         renderCategories : function(categories) {
+            console.log('render', arguments);
             $('#categories-filter').html(this.renderCategoriesRaw(categories));
         },
 
