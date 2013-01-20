@@ -147,7 +147,7 @@
          */
         retrieveCategories : function() {
             $.ajax({
-                        url : /*'categories.json',*/ 'selected_categories.json',
+                        url : /* 'categories.json', */'selected_categories.json',
                         method : 'get',
                         type : 'json',
                         success : function(response) {
@@ -176,6 +176,10 @@
                         categoryId : categories || null,
                         ne : [sw.lat(), sw.lng()],
                         ne : [ne.lat(), ne.lng()]
+                    }, {
+                        onSuccess : function(data) {
+                            console.log(data);
+                        }
                     });
         }
     };
@@ -216,12 +220,24 @@
                     this.renderCategories.bind(this));
             $('#explore-button').click(function() {
                 if (this.router.route) {
-                    this.poiSource.explore(this.router.route.bounds, null,
-                            function(response) {
+                    this.poiSource.explore(this.router.route.bounds, this
+                                    .getCategoriesIds(), function(response) {
                                 console.log(response);
                             });
                 }
             }.bind(this));
+        },
+
+        getCategoriesIds : function() {
+            var inputs = $('#categories-filter input'),
+                res = [];
+            for (var i = 0, len = inputs.length; i < len; i++) {
+                var input = inputs[i];
+                if (input.checked) {
+                    res.push(input.id.replace('category-checkbox-', ''));
+                }
+            }
+            return res;
         },
 
         applyPreset : function(categories) {
@@ -244,8 +260,8 @@
                         '<li><label class="checkbox" for="category-checkbox-'
                                 + category.id
                                 + '"><input type="checkbox" id="category-checkbox-'
-                                + category.id + '" checked="true"> ' + category.name
-                                + '</label>';
+                                + category.id + '" checked="true"> '
+                                + category.name + '</label>';
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
                 }
