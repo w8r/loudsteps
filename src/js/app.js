@@ -317,7 +317,7 @@
                             preventSubmitOnEnter : true,
                             delimeters : [44, 188, 13],
                             backspace : [8],
-                            tagsContainer : input.previous(),
+                            tagsContainer : container,
                             tagClass : 'label label-info genre-tag',
                             tagCloseIcon : '&times'
                         });
