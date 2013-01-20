@@ -1,17 +1,20 @@
 @import "mixins.less";
-
-body {}
+body {
+}
 
 #map {
 	width: 70%;
 	height: 100%;
 	display: block;
 	position: absolute;
-	
-	// fixes google maps & bootstrap conflict
-	img { max-width: none; }
-    label { width: auto; display: inline; }
-    
+	img {
+		max-width: none;
+	}
+
+	label {
+		width: auto;
+		display: inline;
+	}
 }
 
 #settings {
@@ -20,9 +23,9 @@ body {}
 	overflow-y: auto;
 	position: absolute;
 	right: 0;
-	border-left: 1px solid rgba(0,0,0,.2);
-	
+	border-left: 1px solid rgba(0, 0, 0, .2);
 	ul {
 		padding-left: 20px;
 	}
 }
+
