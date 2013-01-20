@@ -284,11 +284,22 @@
                     new Foursquare(this.router, this.map,
                             FOURSQUARE_CLIENT_KEY, FOURSQUARE_SECRET_KEY);
             this.dataSource = new Echonest(ECHONEST_API_KEY);
-            this.dataSource.getGenresList(function(genres) {
-                        // this.genresSelect = this.getGenresSelect(genres);
-                        this.genres = genres;
-                    }.bind(this));
+            this.dataSource.getGenresList(this.initGenres.bind(this));
             this.bindEvents();
+        },
+
+        initGenres : function(genres) {
+            this.genres = genres;
+            $('#categories-filter .tagManager').each(function(input) {
+                input = $(input);
+                input.tagsManager({
+                            prefilled : (input.data('genres') || '').split(','),
+                            preventSubmitOnEnter : true,
+                            typeahead : true,
+                            typeaheadAjaxSource : null,
+                            typeaheadSource : this.getGenres()
+                        });
+            });
         },
 
         getGenresSelect : function(genres, selection) {
