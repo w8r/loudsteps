@@ -131,7 +131,7 @@
         },
 
         drawTies : function() {
-            if (this.points) {
+            if (this.map.controlPoints) {
             }
         }
 
@@ -238,6 +238,7 @@
                         });
                 this.markers.push(marker);
             }
+            this.map.controlPoints = this.markers;
         },
 
         /**
