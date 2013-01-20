@@ -275,7 +275,7 @@
             this.poiSource =
                     new Foursquare(this.router, this.map,
                             FOURSQUARE_CLIENT_KEY, FOURSQUARE_SECRET_KEY);
-            this.dataSource = new Echonest(ECHONEST_API);
+            this.dataSource = new Echonest(ECHONEST_API_KEY);
             this.bindEvents();
         },
 
