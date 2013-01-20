@@ -185,10 +185,13 @@
                         sw : [sw.lat(), sw.lng()],
                         ne : [ne.lat(), ne.lng()]
                     }, {
-                        onSuccess : function(data) {
-                            console.log(data);
-                        }
+                        onSuccess : this.putPOIs.bind(this)
                     });
+        },
+
+        putPOIs : function(data) {
+            console.log(data.response.venues);
+            var venues = data.response.venues;
         }
     };
 
