@@ -361,24 +361,6 @@
                     "suffix" : ".png"
                 }
             }, {
-                "id" : "4bf58dd8d48988d129941735",
-                "name" : "City Hall",
-                "pluralName" : "City Halls",
-                "shortName" : "City Hall",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/building/cityhall_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d12b941735",
-                "name" : "Courthouse",
-                "pluralName" : "Courthouses",
-                "shortName" : "Courthouse",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/building/government_courthouse_",
-                    "suffix" : ".png"
-                }
-            }, {
                 "id" : "4bf58dd8d48988d12c941735",
                 "name" : "Fire Station",
                 "pluralName" : "Fire Stations",
@@ -540,61 +522,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_",
                 "suffix" : ".png"
             },
-            "categories" : [{
-                "id" : "4bf58dd8d48988d1ef931735",
-                "name" : "Airport Food Court",
-                "pluralName" : "Airport Food Court",
-                "shortName" : "Food Court",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d1f0931735",
-                "name" : "Airport Gate",
-                "pluralName" : "Airport Gates",
-                "shortName" : "Gate",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_gate_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4eb1bc533b7b2c5b1d4306cb",
-                "name" : "Airport Lounge",
-                "pluralName" : "Airport Lounges",
-                "shortName" : "Lounge",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_lounge_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d1eb931735",
-                "name" : "Airport Terminal",
-                "pluralName" : "Airport Terminals",
-                "shortName" : "Terminal",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_terminal_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d1ec931735",
-                "name" : "Airport Tram",
-                "pluralName" : "Airport Trams",
-                "shortName" : "Tram",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_tram_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d1f7931735",
-                "name" : "Plane",
-                "pluralName" : "Planes",
-                "shortName" : "Plane",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_",
-                    "suffix" : ".png"
-                }
-            }]
+            "categories" : []
         }, {
             "id" : "4bf58dd8d48988d1fe931735",
             "name" : "Bus Station",
