@@ -214,7 +214,7 @@
                             icon : {
                                 url : icon.prefix + size + icon.name,
                                 size : new google.maps.Size(size, size),
-                                anchor : new google.maps.Point(-(size / 2),
+                                anchor : new google.maps.Point(size / 2,
                                         (size / 2))
                             },
                             visible : true,
