@@ -402,10 +402,7 @@
                                 + category.id
                                 + '" checked="true"> '
                                 + category.name
-                                + '</label><div class="tags-container" id="genres-'
-                                + category.id
-                                + '-tagsContainer">'
-                                + '</div><div class="input-append">'
+                                + '</label><div class="input-append">'
                                 + '<input type="text" class="tagManager genres" '
                                 + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
