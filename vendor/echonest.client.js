@@ -141,7 +141,7 @@
          * Used to build a request to the API
          */
         var Request = function() {
-
+console.log(arguments);
             // merge any extended api details together
             this.extendedDetails = $.extend.apply({}, arguments);
 
