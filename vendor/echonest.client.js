@@ -278,6 +278,9 @@
              * @returns A collection object.
              */
             images : function(callback, options) {
+                console.log(options, {
+                            name : this.name
+                        });
                 var request = new Request(options, {
                             name : this.name
                         });
