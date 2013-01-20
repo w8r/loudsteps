@@ -444,6 +444,7 @@
         },
 
         renderCategories : function(categories) {
+            console.log(categories);
             $('#categories-filter').html(this.renderCategoriesRaw(this
                     .applyPreset(categories)));
         },
