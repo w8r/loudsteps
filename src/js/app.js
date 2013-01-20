@@ -303,7 +303,7 @@
                             preventSubmitOnEnter : true,
                             delimeters : [44, 188, 13],
                             backspace : [8],
-                            tagClass: 'badge',
+                            tagClass: 'badge genre-tag',
                             tagCloseIcon: '&times'
                         });
             }.bind(this));
