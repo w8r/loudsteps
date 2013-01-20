@@ -87,6 +87,7 @@
          */
         updateRoute : function(route) {
             this.route = route || this.renderer.getDirections().routes[0];
+            event.fire(this, 'route_updated', this.route);
             this.drawBounds(this.route.bounds);
         },
 
