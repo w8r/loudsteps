@@ -142,7 +142,6 @@
          */
         var Request = function(options) {
             options = options || {};
-            console.log(arguments);
             // merge any extended api details together
             this.extendedDetails = $.extend.apply({}, arguments);
 
@@ -189,7 +188,7 @@
         };
 
         Request.prototype.get = function(endPoint, callbackSuccess) {
-            console.log(endPoint, {
+            console.log('request', endPoint, {
                         endPoint : endPoint,
                         success : callbackSuccess,
                         method : 'GET'
