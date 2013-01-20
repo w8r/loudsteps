@@ -308,14 +308,13 @@
                     trigger = input.next();
 
                 trigger.click(function() {
-                            var el = $(this);
-                            console.log(el.find('.icon')[0])
-                            if (el.hasClass('icon-tag')) {
-                                el.find('.icon').removeClass('icon-tag')
+                            var icon = $(this).find('.icon');
+                            if (icon.hasClass('icon-tag')) {
+                                icon.find('.icon').removeClass('icon-tag')
                                         .addClass('icon-chevron-left');
                                 input.removeClass('hide');
                             } else {
-                                el.find('.icon').addClass('icon-tag')
+                                icon.find('.icon').addClass('icon-tag')
                                         .removeClass('icon-chevron-left');
                                 input.addClass('hide');
                             }
