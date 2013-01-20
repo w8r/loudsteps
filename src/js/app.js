@@ -313,14 +313,14 @@
                                 icon.removeClass('icon-tag')
                                         .addClass('icon-chevron-left');
                                 input.parent().addClass('input-append')
-                                        .removeClass('inline-control');
+                                        .removeClass('pull-right');
 
                                 input.removeClass('hide');
                             } else {
                                 icon.addClass('icon-tag')
                                         .removeClass('icon-chevron-left');
                                 input.parent().removeClass('input-append')
-                                        .addClass('inline-control');
+                                        .addClass('pull-right');
                                 input.addClass('hide');
                             }
                         });
