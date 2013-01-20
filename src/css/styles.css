@@ -59,6 +59,12 @@
   display: block;
   float: left;
 }
+.inline-control {
+  display: inline-block;
+  float: right;
+  margin-top: -12px;
+  margin-right: 20px;
+}
 .icon.icon-foursquare,
 .icon.icon-echonest {
   background-position: top left;
