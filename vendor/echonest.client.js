@@ -289,6 +289,7 @@
                 var request = new Request(options, {
                             name : this.name
                         });
+                console.log(request);
                 request.get(this.endPoint + 'images', function(response) {
                             callback(new ImageCollection(response.getData()));
                         });
