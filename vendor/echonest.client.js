@@ -285,16 +285,9 @@
              * @returns A collection object.
              */
             images : function(callback, options) {
-                console.log(options, {
+                var request = new Request(options, {
                             name : this.name
                         });
-                try {
-                    var request = new Request(options, {
-                                name : this.name
-                            });
-                } catch (e) {
-                    console.log(request, e);
-                }
                 request.get(this.endPoint + 'images', function(response) {
                             callback(new ImageCollection(response.getData()));
                         });
