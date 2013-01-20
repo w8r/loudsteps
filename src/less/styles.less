@@ -1,7 +1,6 @@
 @import "mixins.less";
-
 .hide {
-	display: none !important;
+	display: none ! important;
 }
 
 #map {
@@ -32,21 +31,24 @@
 			vertical-align: top;
 		}
 	}
-	input.genres {
-		display: block;
-        float: left;
-	}
+}
+
+.genres {
+	display: block;
+	float: left;
 }
 
 .icon {
-	&.icon-foursquare,
-	&.icon-echonest {
+	&.icon-foursquare , &.icon-echonest {
 		background-position: top left;
 	}
+
 	&.icon-foursquare {
 		background-image: url(../img/foursquare-16x16.png);
 	}
+
 	&.icon-echonest {
 		background-image: url(../img/echonest-16x16.png);
 	}
 }
+
