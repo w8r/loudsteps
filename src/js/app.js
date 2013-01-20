@@ -306,6 +306,18 @@
                 input = $(input);
                 var container = input.previous(),
                     trigger = input.next();
+
+                trigger.click(function() {
+                            if (this.hasClass('icon-tag')) {
+                                this.removeClass('icon-tag')
+                                        .addClass('icon-chevron-left');
+                                input.removeClass('hide');
+                            } else {
+                                this.addClass('icon-tag')
+                                        .removeClass('icon-chevron-left');
+                                input.addClass('hide');
+                            }
+                        });
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
