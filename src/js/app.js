@@ -128,6 +128,11 @@
                 delete this.destination;
             }
             event.fire(this, 'route_updated', this.route);
+        },
+
+        drawTies : function() {
+            if (this.points) {
+            }
         }
 
     };
