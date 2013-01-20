@@ -143,11 +143,7 @@
         var Request = function() {
 
             // merge any extended api details together
-            try {
-                this.extendedDetails = $.extend.apply(true, arguments);
-            } catch (e) {
-                console.error(e);
-            }
+            this.extendedDetails = $.extend.apply(true, arguments);
 
             function url() {
                 return _en.constants.endPoint + _en.constants.endPointVersion
@@ -190,6 +186,11 @@
         };
 
         Request.prototype.get = function(endPoint, callbackSuccess) {
+            console.log(endPoint, {
+                        endPoint : endPoint,
+                        success : callbackSuccess,
+                        method : 'GET'
+                    });
             $.ajax(this.settings({
                         endPoint : endPoint,
                         success : callbackSuccess,
