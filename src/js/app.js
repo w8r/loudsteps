@@ -303,7 +303,7 @@
                             preventSubmitOnEnter : true,
                             delimeters : [44, 188, 13],
                             backspace : [8],
-                            tagClass: 'badge label label-info',
+                            tagClass: 'label label-info',
                             tagCloseIcon: '&times'
                         });
             }.bind(this));
