@@ -11,32 +11,12 @@
             },
             "categories" : []
         }, {
-            "id" : "4bf58dd8d48988d17c941735",
-            "name" : "Casino",
-            "pluralName" : "Casinos",
-            "shortName" : "Casino",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/casino_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
             "id" : "5032792091d4c4b30a586d5c",
             "name" : "Concert Hall",
             "pluralName" : "Concert Halls",
             "shortName" : "Concert Hall",
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/musicvenue_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4deefb944765f83613cdba6e",
-            "name" : "Historic Site",
-            "pluralName" : "Historic Sites",
-            "shortName" : "Historic Site",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/historicsite_",
                 "suffix" : ".png"
             },
             "categories" : []
@@ -96,25 +76,6 @@
             },
             "categories" : []
         }, {
-            "id" : "4bf58dd8d48988d17b941735",
-            "name" : "Zoo",
-            "pluralName" : "Zoos",
-            "shortName" : "Zoo",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/zoo_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d19e941735",
-            "name" : "College Engineering Building",
-            "pluralName" : "College Engineering Buildings",
-            "shortName" : "Engineering",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/education/collegeacademicbuildings_engineering_",
-                "suffix" : ".png"
-            }
-        }, {
             "id" : "4bf58dd8d48988d16e941735",
             "name" : "Fast Food Restaurant",
             "pluralName" : "Fast Food Restaurants",
@@ -131,26 +92,6 @@
             "shortName" : "Japanese",
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/food/japanese_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d116941735",
-            "name" : "Bar",
-            "pluralName" : "Bars",
-            "shortName" : "Bar",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/nightlife/bar_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d11e941735",
-            "name" : "Cocktail Bar",
-            "pluralName" : "Cocktail Bars",
-            "shortName" : "Cocktail",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/nightlife/cocktails_",
                 "suffix" : ".png"
             },
             "categories" : []
@@ -179,26 +120,6 @@
             "name" : "City",
             "pluralName" : "Cities",
             "shortName" : "City",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/neighborhood_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d159941735",
-            "name" : "Hiking Trail",
-            "pluralName" : "Hiking Trails",
-            "shortName" : "Hiking Trail",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/hikingtrail_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "50aaa4314b90af0d42d5de10",
-            "name" : "Island",
-            "pluralName" : "Islands",
-            "shortName" : "Island",
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/neighborhood_",
                 "suffix" : ".png"
@@ -254,34 +175,6 @@
                 "suffix" : ".png"
             }
         }, {
-            "id" : "4bf58dd8d48988d12a941735",
-            "name" : "Capitol Building",
-            "pluralName" : "Capitol Buildings",
-            "shortName" : "Capital Building",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/building/government_capitolbuilding_",
-                "suffix" : ".png"
-            }
-        }, {
-            "id" : "4bf58dd8d48988d12e941735",
-            "name" : "Police Station",
-            "pluralName" : "Police Stations",
-            "shortName" : "Police Station",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/building/government_policestation_",
-                "suffix" : ".png"
-            }
-
-        }, {
-            "id" : "4bf58dd8d48988d196941735",
-            "name" : "Hospital",
-            "pluralName" : "Hospitals",
-            "shortName" : "Hospital",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/building/medical_hospital_",
-                "suffix" : ".png"
-            }
-        }, {
             "id" : "4bf58dd8d48988d132941735",
             "name" : "Church",
             "pluralName" : "Churches",
@@ -300,15 +193,6 @@
                 "suffix" : ".png"
             },
             "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d186941735",
-            "name" : "Liquor Store",
-            "pluralName" : "Liquor Stores",
-            "shortName" : "Liquor Store",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/shops/food_liquor_",
-                "suffix" : ".png"
-            }
         }, {
             "id" : "50be8ee891d4fa8dcc7199a7",
             "name" : "Market",
