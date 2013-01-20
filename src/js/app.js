@@ -225,7 +225,7 @@
         },
 
         applyPreset : function(categories) {
-            for(var i = 0)
+            
             return categories;
         },
 
