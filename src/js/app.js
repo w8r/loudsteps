@@ -308,12 +308,13 @@
                     trigger = input.next();
 
                 trigger.click(function() {
-                            if (this.hasClass('icon-tag')) {
-                                this.removeClass('icon-tag')
+                            var el = $(this);
+                            if (el.hasClass('icon-tag')) {
+                                el.removeClass('icon-tag')
                                         .addClass('icon-chevron-left');
                                 input.removeClass('hide');
                             } else {
-                                this.addClass('icon-tag')
+                                el.addClass('icon-tag')
                                         .removeClass('icon-chevron-left');
                                 input.addClass('hide');
                             }
