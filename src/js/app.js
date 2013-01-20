@@ -396,7 +396,11 @@
                                 + category.id
                                 + '" checked="true"> '
                                 + category.name
-                                + '<input type="text" class="tagManager" data-genres="" autocomplete="off" /></label>';
+                                + '<input type="text" class="tagManager genres" '
+                                + 'name="genres-'
+                                + category.id
+                                + '" '
+                                + 'data-genres="" autocomplete="off" /></label>';
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
                 }
