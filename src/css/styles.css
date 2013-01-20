@@ -25,6 +25,9 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+.hide {
+  display: none;
+}
 #map {
   width: 70%;
   height: 100%;
