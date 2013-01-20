@@ -197,7 +197,7 @@
             var tlis = obj.data("tlis");
             var tlid = obj.data("tlid");
 
-            var p = $.inArray(tagId, tlid)
+            var p = tlid.indexOf(tagId)
 
             // console.log("TagIdToRemove: " + tagId);
             // console.log("position: " + p);
@@ -240,7 +240,7 @@
                 return;
 
             var alreadyInList = false;
-            var p = $.inArray(tag, tlis);
+            var p = tlis.indexOf(tag);
             if (-1 != p) {
                 // console.log("tag:" + tag + " !!already in list!!");
                 alreadyInList = true;
