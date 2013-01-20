@@ -462,7 +462,9 @@
                                 + 'name="genres-'
                                 + category.id
                                 + '" data-provide="typeahead" '
-                                + 'data-genres="" autocomplete="off" />'
+                                + 'data-genres="'
+                                + category.genres
+                                + '" autocomplete="off" />'
                                 + '<span class="btn btn-mini"><i class="icon icon-tag">'
                                 + '</i></span></div>'
                                 + '<label class="checkbox" for="category-checkbox-'
