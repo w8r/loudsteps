@@ -201,20 +201,18 @@
                 icon = poi.categories[0].icon;
                 size = parseInt(icon.sizes[0]);
                 console.log({
-                                url : icon.prefix + size + icon.name,
-                                size : new google.maps.Size(size, size),
-                                origin : new google.maps.Point(-size / 2, -size
-                                                / 2)
-                            })
+                            url : icon.prefix + size + icon.name,
+                            size : new google.maps.Size(size, size),
+                            origin : new google.maps.Point(-size / 2, -size / 2)
+                        })
                 marker = new google.maps.Marker({
                             map : this.map,
                             icon : {
                                 url : icon.prefix + size + icon.name,
-                                size : new google.maps.Size(size, size)//,
-                                //origin : new google.maps.Point(-size / 2, -size
-                                //                / 2)
+                                size : new google.maps.Size(size, size),
+                                origin : new google.maps.Point(0, -size / 2)
                             },
-                            visible:true,
+                            visible : true,
                             title : poi.name,
                             position : new google.maps.LatLng(poi.location.lat,
                                     poi.location.lng)
