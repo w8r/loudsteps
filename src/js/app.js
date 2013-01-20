@@ -410,7 +410,7 @@
                                 + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
                                 + 'data-genres="" autocomplete="off" />'
-                                + '<span class="btn btn-mini"><i class="icon icon-tag"></i></span>';
+                                + '<span class="btn"><i class="icon icon-tag"></i></span>';
 
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);

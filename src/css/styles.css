@@ -49,6 +49,9 @@
 #settings ul {
   padding-left: 20px;
 }
+#settings ul li .btn {
+  vertical-align: top;
+}
 .icon.icon-foursquare,
 .icon.icon-echonest {
   background-position: top left;
