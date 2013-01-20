@@ -242,6 +242,9 @@
             }.bind(this));
         },
 
+        /**
+         * Filters categories IDs for 4sq API
+         */
         getCategoriesIds : function() {
             var inputs = $('#categories-filter input'),
                 res = [];
