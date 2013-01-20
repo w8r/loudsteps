@@ -191,9 +191,20 @@
 
         putPOIs : function(data) {
             console.log(data.response.venues);
-            var POIs = data.response.venues, marker, icon;
+            var POIs = data.response.venues, marker, icon, poi;
             for (var i = 0, len = POIs.length; i < len; i++) {
-
+                poi = POIs[i];
+                icon = poi.categories[0].icon;
+                icon =
+                        new google.maps.MarkerImage(icon.prefix + 32
+                                        + icon.name, new google.maps.Size(
+                                        icon.sizes[0], icons.sizes[0]));
+                marker = new google.maps.Marker({
+                            map : this.map,
+                            icon : icon,
+                            position : new google.maps.LatLng(poi.location.lat,
+                                    poi.location.lng)
+                        });
             }
         }
     };
