@@ -143,7 +143,11 @@
         var Request = function() {
 
             // merge any extended api details together
-            this.extendedDetails = $.extend.apply(true, arguments);
+            try {
+                this.extendedDetails = $.extend.apply(true, arguments);
+            } catch (e) {
+                console.error(e);
+            }
 
             function url() {
                 return _en.constants.endPoint + _en.constants.endPointVersion
