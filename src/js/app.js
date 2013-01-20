@@ -362,6 +362,13 @@
         renderCategories : function(categories) {
             $('#categories-filter').html(this.renderCategoriesRaw(this
                     .applyPreset(categories)));
+            $('#categories-filter .tagManager').each(function(input) {
+                        input = $(input);
+                        input.tagsManager({
+                                    prefilled : (input.data('genres') || '')
+                                            .split(',')
+                                });
+                    });
         },
 
         /**
@@ -375,8 +382,10 @@
                         '<li><label class="checkbox" for="category-checkbox-'
                                 + category.id
                                 + '"><input type="checkbox" id="category-checkbox-'
-                                + category.id + '" checked="true"> '
-                                + category.name + '</label>';
+                                + category.id
+                                + '" checked="true"> '
+                                + category.name
+                                + '<input type="text" class="tagManager" data-genres="" /></label>';
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
                 }
