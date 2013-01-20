@@ -283,6 +283,7 @@
                             FOURSQUARE_CLIENT_KEY, FOURSQUARE_SECRET_KEY);
             this.dataSource = new Echonest(ECHONEST_API_KEY);
             this.dataSource.getGenresList(function(genres) {
+                        this.genresSelect = this.getGenresSelect(genres);
                     }.bind(this));
             this.bindEvents();
         },
