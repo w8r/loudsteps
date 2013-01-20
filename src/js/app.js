@@ -242,6 +242,7 @@
             var marker;
             while (marker = this.markers.pop()) {
                 marker.setMap(null);
+                this.circles.pop().setMap(null);
             }
         }
     };
