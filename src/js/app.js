@@ -215,7 +215,7 @@
                             fillColor : '#009bd9',
                             fillOpacity : 0.2,
                             strokeWeight : 0.5,
-                            map : this
+                            map : this.map
                         });
                 this.circles.push(circle);
 
