@@ -149,6 +149,8 @@
     Foursquare.prototype = {
 
         markers : [],
+        
+        circles: [],
 
         /**
          * Retrieves categories cache
@@ -196,7 +198,7 @@
          *            data
          */
         putPOIs : function(data) {
-            var POIs = data.response.venues, marker, icon, poi, size;
+            var POIs = data.response.venues, marker, icon, poi, size, circle;
             this.clearPOIs();
             for (var i = 0, len = POIs.length; i < len; i++) {
                 poi = POIs[i];
@@ -216,6 +218,8 @@
                                     poi.location.lng)
                         });
                 this.markers.push(marker);
+                
+                circle = new google.maps.Circle({})
             }
         },
 
@@ -258,6 +262,8 @@
     };
 
     App.prototype = {
+        
+        constructor: App,
 
         /**
          * Default zoom to init
