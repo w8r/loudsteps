@@ -75,3 +75,9 @@
 	-moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
 	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
 }
+
+.genre-tag {
+	vertical-alin: top;
+	line-height: 22px;
+	margin-right: 5px;
+}
