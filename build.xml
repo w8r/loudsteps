@@ -76,6 +76,7 @@
 		<replace file="index.html" token="{GMAPS_API}" value="${GOOGLE_MAPS_API}" />
 		<replace file="index.html" token="{4SQ_API}" value="${4SQ_API}" />
 		<replace file="index.html" token="{4SQ_API_SECRET}" value="${4SQ_API_SECRET}" />
+		<replace file="index.html" token="{ECHONEST_API}" value="${ECHONEST_API}" />
 		<replace file="index.html" token="../" value="" />
 		<replace file="index.html" token="./" value="app/" />
 
