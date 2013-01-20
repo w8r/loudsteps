@@ -230,7 +230,6 @@
                         var routeless = !route,
                             button = $('#explore-button'),
                             dis = 'disabled';
-                        console.log('has no route', routeless, route)
                         if (routeless) {
                             button.attr(dis, true).addClass(dis);
                         } else {
