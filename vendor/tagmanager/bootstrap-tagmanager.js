@@ -500,7 +500,6 @@
             }
 
             if (tagManagerOptions.prefilled != null) {
-                console.log(tagManagerOptions.prefilled);
                 if (typeof(tagManagerOptions.prefilled) == "object") {
                     var pta = tagManagerOptions.prefilled;
                     $.each(pta, function(key, val) {
