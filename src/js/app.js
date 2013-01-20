@@ -234,7 +234,7 @@
                         if (routeless) {
                             button.attr(dis, true).addClass(dis);
                         } else {
-                            button.removeAttr(dis, true).removeClass(dis);
+                            button.removeAttr(dis).removeClass(dis);
                         }
                     });
             $('#explore-button').click(function() {
