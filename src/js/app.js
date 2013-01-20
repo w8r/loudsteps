@@ -153,7 +153,7 @@
                         success : function(response) {
                             this.categoriesCache = response.response.categories;
                             event.fire(this, 'categories_received',
-                                    this.categoriesCache);
+                                    [this.categoriesCache]);
                         }.bind(this)
                     });
         },
