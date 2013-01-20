@@ -222,16 +222,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/beach_",
                 "suffix" : ".png"
             },
-            "categories" : [{
-                "id" : "4bf58dd8d48988d1e3941735",
-                "name" : "Surf Spot",
-                "pluralName" : "Surf Spots",
-                "shortName" : "Surf Spot",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/surfspot_",
-                    "suffix" : ".png"
-                }
-            }]
+            "categories" : []
         }, {
             "id" : "4bf58dd8d48988d1df941735",
             "name" : "Bridge",
