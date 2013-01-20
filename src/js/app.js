@@ -422,7 +422,8 @@
                                 + category.id
                                 + '" checked="true"> '
                                 + category.name
-                                + '</label><div class="pull-right">'
+                                + '</label>'
+                                + '<div class="pull-right">'
                                 + '<div></div><input type="text" class="tagManager genres hide" '
                                 + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
@@ -430,9 +431,10 @@
                                 + '<span class="btn"><i class="icon icon-tag">'
                                 + '</i></span></div>';
 
-                if (category.categories && category.categories.length !== 0) {
-                    html += this.renderCategoriesRaw(category.categories);
-                }
+                // if (category.categories && category.categories.length !== 0)
+                // {
+                // html += this.renderCategoriesRaw(category.categories);
+                //                }
                 html += '</li>'
             }
             return (html + '</ul>');
