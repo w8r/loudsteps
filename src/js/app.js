@@ -405,12 +405,13 @@
                                 + category.id
                                 + '" checked="true"> '
                                 + category.name
-                                + '</label>'
+                                + '</label><div class="input-append">'
                                 + '<input type="text" class="tagManager genres" '
                                 + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
                                 + 'data-genres="" autocomplete="off" />'
-                                + '<span class="btn"><i class="icon icon-tag"></i></span>';
+                                + '<span class="btn"><i class="icon icon-tag">'
+                                + '</i></span></div>';
 
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
