@@ -78,7 +78,7 @@
 		<replace file="index.html" token="./" value="app/" />
 
 		<echo message="Synchronizing to ${host}..." />
-		<scp todir="${user}:${pwd}@${host}:${path}" port="${port}" verbose="true" sftp="true" trust="true">
+		<!--<scp todir="${user}:${pwd}@${host}:${path}" port="${port}" verbose="true" sftp="true" trust="true">
 			<fileset dir="${basedir}">
 				<include name="**/*.js" />
 				<include name="**/*.gz" />
@@ -86,7 +86,7 @@
 				<include name="**/*.html" />
 				<modified />
 			</fileset>
-		</scp>
+		</scp>-->
 		<git-add file="." />
 		<tstamp>
 			<format property="timestamp" pattern="yyyy.MM.dd_HH-mm-ss" />
