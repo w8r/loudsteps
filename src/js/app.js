@@ -1,6 +1,7 @@
 (function() {
 
-    var event = require('bean');
+    var event = require('bean'),
+        _ = require('underscore');
 
     /***************************************************************************
      * Routing class
@@ -211,8 +212,8 @@
          * Binds controls together
          */
         bindEvents : function() {
-            event.on(this.poiSource, 'categories_received', this.renderCategories
-                            .bind(this));
+            event.on(this.poiSource, 'categories_received',
+                    this.renderCategories.bind(this));
             $('#explore-button').click(function() {
                 if (this.router.route) {
                     this.poiSource.explore(this.router.route.bounds, null,
@@ -225,6 +226,7 @@
 
         renderCategories : function(categories) {
             console.log('render', arguments);
+
             $('#categories-filter').html(this.renderCategoriesRaw(categories));
         },
 
