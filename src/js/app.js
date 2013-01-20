@@ -315,6 +315,7 @@
                             preventSubmitOnEnter : true,
                             delimeters : [44, 188, 13],
                             backspace : [8],
+                            tagsContainer : input.parent().next(),
                             tagClass : 'label label-info genre-tag',
                             tagCloseIcon : '&times'
                         });
