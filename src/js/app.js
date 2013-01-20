@@ -213,7 +213,8 @@
          */
         bindEvents : function() {
             event.on(this.poiSource, 'categories_received', this.renderCategories
-                            .bind(this))
+                            .bind(this));
+                            console.log('evt listener added');
             $('#explore-button').click(function() {
                 if (this.router.route) {
                     this.poiSource.explore(this.router.route.bounds, null,
