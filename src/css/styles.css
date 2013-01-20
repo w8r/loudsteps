@@ -46,3 +46,6 @@
   right: 0;
   border-left: 1px solid rgba(0, 0, 0, 0.2);
 }
+#settings ul {
+  padding-left: 20px;
+}
