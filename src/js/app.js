@@ -202,7 +202,6 @@
          *            data
          */
         putPOIs : function(data) {
-
             var POIs = data.response.venues, marker, icon, poi, size;
             this.clearPOIs();
             for (var i = 0, len = POIs.length; i < len; i++) {
