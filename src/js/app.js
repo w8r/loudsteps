@@ -237,14 +237,14 @@
          * Renders categories filter in the sidebar
          */
         renderCategoriesRaw : function(categories) {
-            var html = '<ul>';
+            var html = '<ul class="unstyled">';
             for (var i = 0, ii = categories.length; i < ii; i++) {
                 var category = categories[i];
                 html +=
                         '<li><label class="checkbox" for="category-checkbox-'
                                 + category.id
                                 + '"><input type="checkbox" id="category-checkbox-'
-                                + category.id + '"> ' + category.name
+                                + category.id + '" checked="true"> ' + category.name
                                 + '</label>';
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
