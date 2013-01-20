@@ -210,9 +210,9 @@
                             map : this.map,
                             icon : {
                                 url : icon.prefix + size + icon.name,
-                                size : new google.maps.Size(size, size),
-                                origin : new google.maps.Point(-size / 2, -size
-                                                / 2)
+                                size : new google.maps.Size(size, size)//,
+                                //origin : new google.maps.Point(-size / 2, -size
+                                //                / 2)
                             },
                             visible:true,
                             title : poi.name,
