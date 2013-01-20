@@ -311,11 +311,16 @@
                             var icon = $(this).find('.icon');
                             if (icon.hasClass('icon-tag')) {
                                 icon.removeClass('icon-tag')
-                                        .addClass('icon-chevron-left');
+                                        .addClass('icon-chevron-left')
+                                        .parent('div').addClass('input-append')
+                                        .removeClass('inline-control');
                                 input.removeClass('hide');
                             } else {
                                 icon.addClass('icon-tag')
-                                        .removeClass('icon-chevron-left');
+                                        .removeClass('icon-chevron-left')
+                                        .parent('div')
+                                        .removeClass('input-append')
+                                        .addClass('inline-control');
                                 input.addClass('hide');
                             }
                         });
