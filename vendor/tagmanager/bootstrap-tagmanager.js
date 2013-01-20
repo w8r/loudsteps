@@ -381,7 +381,7 @@
                 });
 
             obj.on("keyup", obj, function(e) {
-                var p = $.inArray(e.which, delimeters);
+                var p = delimeters.indexOf(e.which);
                 if (-1 != p) {
                     // user just entered a valid delimeter
                     var user_input = $(this).val(); // user_input =
@@ -396,7 +396,7 @@
 
             if (tagManagerOptions.deleteTagsOnBackspace) {
                 obj.on("keydown", obj, function(e) {
-                            var p = $.inArray(e.which, backspace);
+                            var p = backspace.indexOf(e.which);
                             if (-1 != p) {
                                 // user just entered backspace or equivalent
                                 var user_input = $(this).val(); // user_input =
