@@ -229,7 +229,7 @@
             event.on(this.router, 'route_updated', function(route) {
                         var routeless = !route;
                         console.log('has no route', routeless, route)
-                        $('#explore-button').attr('disabled', routeless)[routeless
+                        $('#explore-button').attr('disabled', !routeless)[routeless
                                 ? 'addClass'
                                 : 'removeClass']('disabled');
                     });
