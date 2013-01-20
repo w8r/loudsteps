@@ -302,7 +302,8 @@
                             typeaheadSource : this.getGenres.bind(this),
                             preventSubmitOnEnter : true,
                             delimeters : [44, 188, 13],
-                            backspace : [8]
+                            backspace : [8],
+                            tagCloseIcon: '&times'
                         });
             }.bind(this));
         },
