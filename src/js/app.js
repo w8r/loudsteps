@@ -365,6 +365,9 @@
             return res;
         },
 
+        /**
+         * Autocompleter for the genre tagger
+         */
         getGenres : function() {
             return _.map(this.genres, function(genre) {
                         return genre.name;
