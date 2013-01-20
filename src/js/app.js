@@ -224,10 +224,13 @@
             }.bind(this));
         },
 
-        renderCategories : function(categories) {
-            console.log('render', arguments);
+        applyPreset : function(categories) {
+            return categories;
+        },
 
-            $('#categories-filter').html(this.renderCategoriesRaw(categories));
+        renderCategories : function(categories) {
+            $('#categories-filter').html(this.renderCategoriesRaw(this
+                    .applyPreset(categories)));
         },
 
         /**
@@ -238,7 +241,7 @@
             for (var i = 0, ii = categories.length; i < ii; i++) {
                 var category = categories[i];
                 html +=
-                        '<li><label for="category-checkbox-'
+                        '<li><label class="checkbox" for="category-checkbox-'
                                 + category.id
                                 + '"><input type="checkbox" id=category-checkbox-'
                                 + category.id + '"> ' + category.name
