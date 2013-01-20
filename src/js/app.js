@@ -351,7 +351,7 @@
                         icon.removeClass('icon-tag')
                                 .addClass('icon-chevron-left');
 
-                        btn.append(input.parent().addClass('input-append')
+                        btn.appendTo(input.parent().addClass('input-append')
                                 .removeClass('pull-right'));
 
                         input.removeClass('hide');
@@ -359,7 +359,7 @@
                         btn.addClass('btn-mini');
                         icon.addClass('icon-tag')
                                 .removeClass('icon-chevron-left');
-                        btn.append(input.parent().removeClass('input-append')
+                        btn.appendTo(input.parent().removeClass('input-append')
                                 .addClass('pull-right').parent().find('.tags'));
 
                         input.addClass('hide');
