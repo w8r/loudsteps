@@ -174,13 +174,13 @@
             console.log({
                         intent : 'browse',
                         categoryId : categories || null,
-                        ne : [sw.lat(), sw.lng()],
+                        sw : [sw.lat(), sw.lng()],
                         ne : [ne.lat(), ne.lng()]
                     });
             this.client.venuesClient.search({
                         intent : 'browse',
                         categoryId : categories || null,
-                        ne : [sw.lat(), sw.lng()],
+                        sw : [sw.lat(), sw.lng()],
                         ne : [ne.lat(), ne.lng()]
                     }, {
                         onSuccess : function(data) {
