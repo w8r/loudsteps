@@ -364,7 +364,7 @@
                                 input.addClass('hide');
                             }
                         });
-                        console.log(input.data('genres'));
+                console.log(input.data('genres').split(','));
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
