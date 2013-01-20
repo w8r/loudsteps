@@ -49,9 +49,9 @@
 #settings ul {
   padding-left: 20px;
 }
-.icon .icon-foursquare {
+.icon.icon-foursquare {
   background-image: url(../img/foursquare-16x16.png);
 }
-.icon .icon-echonest {
+.icon.icon-echonest {
   background-image: url(../img/echonest-16x16.png);
 }
