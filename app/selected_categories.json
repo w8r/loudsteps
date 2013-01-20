@@ -524,25 +524,6 @@
             },
             "categories" : []
         }, {
-            "id" : "4bf58dd8d48988d1fe931735",
-            "name" : "Bus Station",
-            "pluralName" : "Bus Stations",
-            "shortName" : "Bus Station",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/travel/busstation_",
-                "suffix" : ".png"
-            },
-            "categories" : [{
-                "id" : "4bf58dd8d48988d12b951735",
-                "name" : "Bus Line",
-                "pluralName" : "Bus Lines",
-                "shortName" : "Bus",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/busstation_",
-                    "suffix" : ".png"
-                }
-            }]
-        }, {
             "id" : "4bf58dd8d48988d1f9931735",
             "name" : "Road",
             "pluralName" : "Roads",
@@ -571,25 +552,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/travel/trainstation_",
                 "suffix" : ".png"
             },
-            "categories" : [{
-                "id" : "4f4531504b9074f6e4fb0102",
-                "name" : "Platform",
-                "pluralName" : "Platforms",
-                "shortName" : "Platform",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/trainstation_",
-                    "suffix" : ".png"
-                }
-            }, {
-                "id" : "4bf58dd8d48988d12a951735",
-                "name" : "Train",
-                "pluralName" : "Trains",
-                "shortName" : "Train",
-                "icon" : {
-                    "prefix" : "https://foursquare.com/img/categories_v2/travel/trainstation_",
-                    "suffix" : ".png"
-                }
-            }]
+            "categories" : []
         }]
     }
 }
