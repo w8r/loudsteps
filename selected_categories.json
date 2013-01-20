@@ -1,26 +1,6 @@
 {
     "response" : {
         "categories" : [{
-            "id" : "4bf58dd8d48988d1e2931735",
-            "name" : "Art Gallery",
-            "pluralName" : "Art Galleries",
-            "shortName" : "Art Gallery",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/artgallery_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "5032792091d4c4b30a586d5c",
-            "name" : "Concert Hall",
-            "pluralName" : "Concert Halls",
-            "shortName" : "Concert Hall",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/musicvenue_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
             "id" : "4bf58dd8d48988d18f941735",
             "name" : "Art Museum",
             "pluralName" : "Art Museums",
@@ -39,42 +19,12 @@
                 "suffix" : ".png"
             }
         }, {
-            "id" : "4bf58dd8d48988d184941735",
-            "name" : "Stadium",
-            "pluralName" : "Stadiums",
-            "shortName" : "Stadium",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/stadium_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d1e2941735",
-            "name" : "Beach",
-            "pluralName" : "Beaches",
-            "shortName" : "Beach",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/beach_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
             "id" : "4bf58dd8d48988d15c941735",
             "name" : "Cemetery",
             "pluralName" : "Cemeteries",
             "shortName" : "Cemetery",
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/cemetery_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "50aa9e094b90af0d42d5de0d",
-            "name" : "City",
-            "pluralName" : "Cities",
-            "shortName" : "City",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/neighborhood_",
                 "suffix" : ".png"
             },
             "categories" : []
@@ -117,16 +67,6 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/building/religious_church_",
                 "suffix" : ".png"
             }
-        }, {
-            "id" : "4bf58dd8d48988d103941735",
-            "name" : "Home (private)",
-            "pluralName" : "Homes (private)",
-            "shortName" : "Home",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/building/home_",
-                "suffix" : ".png"
-            },
-            "categories" : []
         }, {
             "id" : "50be8ee891d4fa8dcc7199a7",
             "name" : "Market",
