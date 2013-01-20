@@ -232,7 +232,7 @@
                             dis = 'disabled';
                         console.log('has no route', routeless, route)
                         if (routeless) {
-                            button.attr(dis, true).addClass(dis);
+                            button.attr(dis).addClass(dis);
                         } else {
                             button.removeAttr(dis).removeClass(dis);
                         }
