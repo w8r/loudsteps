@@ -368,7 +368,7 @@
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
-                            prefilled : input.data('genres').split(','),
+                            prefilled : input.data('genres'),
                             preventSubmitOnEnter : true,
                             typeahead : true,
                             typeaheadAjaxSource : null,
