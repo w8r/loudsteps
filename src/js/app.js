@@ -14,7 +14,8 @@
         this.renderer = new google.maps.DirectionsRenderer({
                     draggable : true,
                     polylineOptions : {
-                        strokeColor : '#11b6f7'
+                        strokeColor : '#11b6f7',
+                        strokeWeight : 6
                     }
                 });
         this.renderer.setMap(map);
