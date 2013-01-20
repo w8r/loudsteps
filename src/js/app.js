@@ -195,7 +195,6 @@
             for (var i = 0, len = POIs.length; i < len; i++) {
 
             }
-
         }
     };
 
