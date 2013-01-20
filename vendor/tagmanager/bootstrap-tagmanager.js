@@ -512,7 +512,7 @@
 
                     $.each(pta, function(key, val) {
                                 var a = 1;
-                                pushTag(val, obj);
+                                pushTag(key, key);
                             });
 
                 }
