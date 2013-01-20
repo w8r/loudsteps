@@ -282,7 +282,25 @@
                     new Foursquare(this.router, this.map,
                             FOURSQUARE_CLIENT_KEY, FOURSQUARE_SECRET_KEY);
             this.dataSource = new Echonest(ECHONEST_API_KEY);
+            this.dataSource.getGenresList(function(genres) {
+                    }.bind(this));
             this.bindEvents();
+        },
+
+        getGenresSelect : function(genres, selection) {
+            if (genres) {
+                var options = '', genre;
+                for (var i = 0, len = genres.length; i < len; i++) {
+                    genre = genres[i];
+                    options += '<option value="' + genre.name + '"';
+                    if (selection && selection.indexOf(genre.name)) {
+                        options += ' selected';
+                    }
+                    options += '>' + genre.name + '</option>';
+                }
+                return $('<select class="genres-select">' + options
+                        + '</select>');
+            }
         },
 
         /**
