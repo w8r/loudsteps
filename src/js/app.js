@@ -257,6 +257,13 @@
             return res;
         },
 
+        /**
+         * Applies pre-stored preset
+         * 
+         * @param {Array}
+         *            categories
+         * @returns {Array} categories
+         */
         applyPreset : function(categories) {
             return categories;
         },
