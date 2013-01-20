@@ -221,7 +221,7 @@
                             position : new google.maps.LatLng(poi.location.lat,
                                     poi.location.lng)
                         });
-                        new google.maps.Marker({
+                new google.maps.Marker({
                             map : this.map,
                             visible : true,
                             title : poi.name,
@@ -236,9 +236,10 @@
          * Clears categories markers.
          */
         clearPOIs : function() {
-            do {
-                this.markers.pop().setMap(null);
-            } while (this.markers.length);
+            var marker;
+            while (marker = this.markers.pop()) {
+                marker.setMap(null);
+            }
         }
     };
 
