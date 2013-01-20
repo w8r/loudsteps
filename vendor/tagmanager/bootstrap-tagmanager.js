@@ -115,10 +115,10 @@
         };
 
         var trimTag = function(tag) {
-            var txt = tag;
+            var txt = tag,
 
-            var l = txt.length;
-            var t = 0;
+                l = txt.length,
+                t = 0;
 
             for (var i = l - 1; i >= 0; i--) {
                 if (-1 == delimiters.indexOf(txt.charCodeAt(i)))
