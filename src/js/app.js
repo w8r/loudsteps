@@ -227,11 +227,15 @@
             event.on(this.poiSource, 'categories_received',
                     this.renderCategories.bind(this));
             event.on(this.router, 'route_updated', function(route) {
-                        var routeless = !route;
+                        var routeless = !route,
+                            button = $('#explore-button'),
+                            dis = 'disabled';
                         console.log('has no route', routeless, route)
-                        $('#explore-button').attr('disabled', !routeless)[routeless
-                                ? 'addClass'
-                                : 'removeClass']('disabled');
+                        if (routeless) {
+                            button.attr(dis, true).addClass(dis);
+                        } else {
+                            button.removeAttr(dis, true).removeClass(dis);
+                        }
                     });
             $('#explore-button').click(function() {
                 if (this.router.route) {
