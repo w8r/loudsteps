@@ -310,11 +310,11 @@
                 trigger.click(function() {
                             var el = $(this);
                             if (el.hasClass('icon-tag')) {
-                                el.removeClass('icon-tag')
+                                el.find('.icon').removeClass('icon-tag')
                                         .addClass('icon-chevron-left');
                                 input.removeClass('hide');
                             } else {
-                                el.addClass('icon-tag')
+                                el.find('.icon').addClass('icon-tag')
                                         .removeClass('icon-chevron-left');
                                 input.addClass('hide');
                             }
