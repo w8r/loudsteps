@@ -351,9 +351,11 @@
         },
 
         getGenres : function() {
-            return _.map(this.genres, function(genre) {
+            var genres = _.map(this.genres, function(genre) {
                         return genre.name;
                     });
+            console.log(genres);
+            return genres;
         },
 
         /**
