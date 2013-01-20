@@ -151,7 +151,7 @@
                         method : 'get',
                         type : 'json',
                         success : function(response) {
-                            this.categoriesCache = response.response.categories;
+                            this.categoriesCache = response;
                             event.fire(this, 'categories_received',
                                     [this.categoriesCache]);
                         }.bind(this)
@@ -225,7 +225,6 @@
         },
 
         applyPreset : function(categories) {
-            
             return categories;
         },
 
