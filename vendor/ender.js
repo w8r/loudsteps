@@ -1,7 +1,7 @@
 /*!
   * =============================================================
   * Ender: open module JavaScript framework (https://ender.no.de)
-  * Build: ender build reqwest underscore bean bonzo domready qwery jeesh bootstrap
+  * Build: ender build underscore bean reqwest bonzo domready qwery jeesh ender-bootstrap
   * =============================================================
   */
 
@@ -124,527 +124,6 @@
   context['ender'] = context['$'] = ender
 
 }(this));
-
-(function () {
-
-  var module = { exports: {} }, exports = module.exports;
-
-  /*!
-    * Reqwest! A general purpose XHR connection manager
-    * (c) Dustin Diaz 2012
-    * https://github.com/ded/reqwest
-    * license MIT
-    */
-  !function (name, definition) {
-    if (typeof module != 'undefined' && module.exports) module.exports = definition()
-    else if (typeof define == 'function' && define.amd) define(definition)
-    else this[name] = definition()
-  }('reqwest', function () {
-  
-    var win = window
-      , doc = document
-      , twoHundo = /^20\d$/
-      , byTag = 'getElementsByTagName'
-      , readyState = 'readyState'
-      , contentType = 'Content-Type'
-      , requestedWith = 'X-Requested-With'
-      , head = doc[byTag]('head')[0]
-      , uniqid = 0
-      , callbackPrefix = 'reqwest_' + (+new Date())
-      , lastValue // data stored by the most recent JSONP callback
-      , xmlHttpRequest = 'XMLHttpRequest'
-  
-    var isArray = typeof Array.isArray == 'function' ? Array.isArray : function (a) {
-      return a instanceof Array
-    }
-    var defaultHeaders = {
-        contentType: 'application/x-www-form-urlencoded'
-      , requestedWith: xmlHttpRequest
-      , accept: {
-          '*':  'text/javascript, text/html, application/xml, text/xml, */*'
-        , xml:  'application/xml, text/xml'
-        , html: 'text/html'
-        , text: 'text/plain'
-        , json: 'application/json, text/javascript'
-        , js:   'application/javascript, text/javascript'
-        }
-      }
-    var xhr = win[xmlHttpRequest] ?
-      function () {
-        return new XMLHttpRequest()
-      } :
-      function () {
-        return new ActiveXObject('Microsoft.XMLHTTP')
-      }
-  
-    function handleReadyState(o, success, error) {
-      return function () {
-        if (o && o[readyState] == 4) {
-          o.onreadystatechange = undefined;
-          if (twoHundo.test(o.status)) {
-            success(o)
-          } else {
-            error(o)
-          }
-        }
-      }
-    }
-  
-    function setHeaders(http, o) {
-      var headers = o.headers || {}, h
-      headers.Accept = headers.Accept || defaultHeaders.accept[o.type] || defaultHeaders.accept['*']
-      // breaks cross-origin requests with legacy browsers
-      if (!o.crossOrigin && !headers[requestedWith]) headers[requestedWith] = defaultHeaders.requestedWith
-      if (!headers[contentType]) headers[contentType] = o.contentType || defaultHeaders.contentType
-      for (h in headers) {
-        headers.hasOwnProperty(h) && http.setRequestHeader(h, headers[h])
-      }
-    }
-  
-    function setCredentials(http, o) {
-      if (typeof o.withCredentials !== "undefined" && typeof http.withCredentials !== "undefined") {
-        http.withCredentials = !!o.withCredentials
-      }
-    }
-  
-    function generalCallback(data) {
-      lastValue = data
-    }
-  
-    function urlappend(url, s) {
-      return url + (/\?/.test(url) ? '&' : '?') + s
-    }
-  
-    function handleJsonp(o, fn, err, url) {
-      var reqId = uniqid++
-        , cbkey = o.jsonpCallback || 'callback' // the 'callback' key
-        , cbval = o.jsonpCallbackName || reqwest.getcallbackPrefix(reqId)
-        // , cbval = o.jsonpCallbackName || ('reqwest_' + reqId) // the 'callback' value
-        , cbreg = new RegExp('((^|\\?|&)' + cbkey + ')=([^&]+)')
-        , match = url.match(cbreg)
-        , script = doc.createElement('script')
-        , loaded = 0
-        , isIE10 = navigator.userAgent.indexOf('MSIE 10.0') !== -1
-  
-      if (match) {
-        if (match[3] === '?') {
-          url = url.replace(cbreg, '$1=' + cbval) // wildcard callback func name
-        } else {
-          cbval = match[3] // provided callback func name
-        }
-      } else {
-        url = urlappend(url, cbkey + '=' + cbval) // no callback details, add 'em
-      }
-  
-      win[cbval] = generalCallback
-  
-      script.type = 'text/javascript'
-      script.src = url
-      script.async = true
-      if (typeof script.onreadystatechange !== 'undefined' && !isIE10) {
-        // need this for IE due to out-of-order onreadystatechange(), binding script
-        // execution to an event listener gives us control over when the script
-        // is executed. See http://jaubourg.net/2010/07/loading-script-as-onclick-handler-of.html
-        //
-        // if this hack is used in IE10 jsonp callback are never called
-        script.event = 'onclick'
-        script.htmlFor = script.id = '_reqwest_' + reqId
-      }
-  
-      script.onload = script.onreadystatechange = function () {
-        if ((script[readyState] && script[readyState] !== 'complete' && script[readyState] !== 'loaded') || loaded) {
-          return false
-        }
-        script.onload = script.onreadystatechange = null
-        script.onclick && script.onclick()
-        // Call the user callback with the last value stored and clean up values and scripts.
-        o.success && o.success(lastValue)
-        lastValue = undefined
-        head.removeChild(script)
-        loaded = 1
-      }
-  
-      // Add the script to the DOM head
-      head.appendChild(script)
-    }
-  
-    function getRequest(o, fn, err) {
-      var method = (o.method || 'GET').toUpperCase()
-        , url = typeof o === 'string' ? o : o.url
-        // convert non-string objects to query-string form unless o.processData is false
-        , data = (o.processData !== false && o.data && typeof o.data !== 'string')
-          ? reqwest.toQueryString(o.data)
-          : (o.data || null)
-        , http
-  
-      // if we're working on a GET request and we have data then we should append
-      // query string to end of URL and not post data
-      if ((o.type == 'jsonp' || method == 'GET') && data) {
-        url = urlappend(url, data)
-        data = null
-      }
-  
-      if (o.type == 'jsonp') return handleJsonp(o, fn, err, url)
-  
-      http = xhr()
-      http.open(method, url, true)
-      setHeaders(http, o)
-      setCredentials(http, o)
-      http.onreadystatechange = handleReadyState(http, fn, err)
-      o.before && o.before(http)
-      http.send(data)
-      return http
-    }
-  
-    function Reqwest(o, fn) {
-      this.o = o
-      this.fn = fn
-  
-      init.apply(this, arguments)
-    }
-  
-    function setType(url) {
-      var m = url.match(/\.(json|jsonp|html|xml)(\?|$)/)
-      return m ? m[1] : 'js'
-    }
-  
-    function init(o, fn) {
-  
-      this.url = typeof o == 'string' ? o : o.url
-      this.timeout = null
-  
-      // whether request has been fulfilled for purpose
-      // of tracking the Promises
-      this._fulfilled = false
-      // success handlers
-      this._fulfillmentHandlers = []
-      // error handlers
-      this._errorHandlers = []
-      // complete (both success and fail) handlers
-      this._completeHandlers = []
-      this._erred = false
-      this._responseArgs = {}
-  
-      var self = this
-        , type = o.type || setType(this.url)
-  
-      fn = fn || function () {}
-  
-      if (o.timeout) {
-        this.timeout = setTimeout(function () {
-          self.abort()
-        }, o.timeout)
-      }
-  
-      if (o.success) {
-        this._fulfillmentHandlers.push(function () {
-          o.success.apply(o, arguments)
-        })
-      }
-  
-      if (o.error) {
-        this._errorHandlers.push(function () {
-          o.error.apply(o, arguments)
-        })
-      }
-  
-      if (o.complete) {
-        this._completeHandlers.push(function () {
-          o.complete.apply(o, arguments)
-        })
-      }
-  
-      function complete(resp) {
-        o.timeout && clearTimeout(self.timeout)
-        self.timeout = null
-        while (self._completeHandlers.length > 0) {
-          self._completeHandlers.shift()(resp)
-        }
-      }
-  
-      function success(resp) {
-        var r = resp.responseText
-        if (r) {
-          switch (type) {
-          case 'json':
-            try {
-              resp = win.JSON ? win.JSON.parse(r) : eval('(' + r + ')')
-            } catch (err) {
-              return error(resp, 'Could not parse JSON in response', err)
-            }
-            break;
-          case 'js':
-            resp = eval(r)
-            break;
-          case 'html':
-            resp = r
-            break;
-          case 'xml':
-            resp = resp.responseXML;
-            break;
-          }
-        }
-  
-        self._responseArgs.resp = resp
-        self._fulfilled = true
-        fn(resp)
-        while (self._fulfillmentHandlers.length > 0) {
-          self._fulfillmentHandlers.shift()(resp)
-        }
-  
-        complete(resp)
-      }
-  
-      function error(resp, msg, t) {
-        self._responseArgs.resp = resp
-        self._responseArgs.msg = msg
-        self._responseArgs.t = t
-        self._erred = true
-        while (self._errorHandlers.length > 0) {
-          self._errorHandlers.shift()(resp, msg, t)
-        }
-        complete(resp)
-      }
-  
-      this.request = getRequest(o, success, error)
-    }
-  
-    Reqwest.prototype = {
-      abort: function () {
-        this.request.abort()
-      }
-  
-    , retry: function () {
-        init.call(this, this.o, this.fn)
-      }
-  
-      /**
-       * Small deviation from the Promises A CommonJs specification
-       * http://wiki.commonjs.org/wiki/Promises/A
-       */
-  
-      /**
-       * `then` will execute upon successful requests
-       */
-    , then: function (success, fail) {
-        if (this._fulfilled) {
-          success(this._responseArgs.resp)
-        } else if (this._erred) {
-          fail(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
-        } else {
-          this._fulfillmentHandlers.push(success)
-          this._errorHandlers.push(fail)
-        }
-        return this
-      }
-  
-      /**
-       * `always` will execute whether the request succeeds or fails
-       */
-    , always: function (fn) {
-        if (this._fulfilled || this._erred) {
-          fn(this._responseArgs.resp)
-        } else {
-          this._completeHandlers.push(fn)
-        }
-        return this
-      }
-  
-      /**
-       * `fail` will execute when the request fails
-       */
-    , fail: function (fn) {
-        if (this._erred) {
-          fn(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
-        } else {
-          this._errorHandlers.push(fn)
-        }
-        return this
-      }
-    }
-  
-    function reqwest(o, fn) {
-      return new Reqwest(o, fn)
-    }
-  
-    // normalize newline variants according to spec -> CRLF
-    function normalize(s) {
-      return s ? s.replace(/\r?\n/g, '\r\n') : ''
-    }
-  
-    function serial(el, cb) {
-      var n = el.name
-        , t = el.tagName.toLowerCase()
-        , optCb = function (o) {
-            // IE gives value="" even where there is no value attribute
-            // 'specified' ref: http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-862529273
-            if (o && !o.disabled)
-              cb(n, normalize(o.attributes.value && o.attributes.value.specified ? o.value : o.text))
-          }
-  
-      // don't serialize elements that are disabled or without a name
-      if (el.disabled || !n) return;
-  
-      switch (t) {
-      case 'input':
-        if (!/reset|button|image|file/i.test(el.type)) {
-          var ch = /checkbox/i.test(el.type)
-            , ra = /radio/i.test(el.type)
-            , val = el.value;
-          // WebKit gives us "" instead of "on" if a checkbox has no value, so correct it here
-          (!(ch || ra) || el.checked) && cb(n, normalize(ch && val === '' ? 'on' : val))
-        }
-        break;
-      case 'textarea':
-        cb(n, normalize(el.value))
-        break;
-      case 'select':
-        if (el.type.toLowerCase() === 'select-one') {
-          optCb(el.selectedIndex >= 0 ? el.options[el.selectedIndex] : null)
-        } else {
-          for (var i = 0; el.length && i < el.length; i++) {
-            el.options[i].selected && optCb(el.options[i])
-          }
-        }
-        break;
-      }
-    }
-  
-    // collect up all form elements found from the passed argument elements all
-    // the way down to child elements; pass a '<form>' or form fields.
-    // called with 'this'=callback to use for serial() on each element
-    function eachFormElement() {
-      var cb = this
-        , e, i, j
-        , serializeSubtags = function (e, tags) {
-          for (var i = 0; i < tags.length; i++) {
-            var fa = e[byTag](tags[i])
-            for (j = 0; j < fa.length; j++) serial(fa[j], cb)
-          }
-        }
-  
-      for (i = 0; i < arguments.length; i++) {
-        e = arguments[i]
-        if (/input|select|textarea/i.test(e.tagName)) serial(e, cb)
-        serializeSubtags(e, [ 'input', 'select', 'textarea' ])
-      }
-    }
-  
-    // standard query string style serialization
-    function serializeQueryString() {
-      return reqwest.toQueryString(reqwest.serializeArray.apply(null, arguments))
-    }
-  
-    // { 'name': 'value', ... } style serialization
-    function serializeHash() {
-      var hash = {}
-      eachFormElement.apply(function (name, value) {
-        if (name in hash) {
-          hash[name] && !isArray(hash[name]) && (hash[name] = [hash[name]])
-          hash[name].push(value)
-        } else hash[name] = value
-      }, arguments)
-      return hash
-    }
-  
-    // [ { name: 'name', value: 'value' }, ... ] style serialization
-    reqwest.serializeArray = function () {
-      var arr = []
-      eachFormElement.apply(function (name, value) {
-        arr.push({name: name, value: value})
-      }, arguments)
-      return arr
-    }
-  
-    reqwest.serialize = function () {
-      if (arguments.length === 0) return ''
-      var opt, fn
-        , args = Array.prototype.slice.call(arguments, 0)
-  
-      opt = args.pop()
-      opt && opt.nodeType && args.push(opt) && (opt = null)
-      opt && (opt = opt.type)
-  
-      if (opt == 'map') fn = serializeHash
-      else if (opt == 'array') fn = reqwest.serializeArray
-      else fn = serializeQueryString
-  
-      return fn.apply(null, args)
-    }
-  
-    reqwest.toQueryString = function (o) {
-      var qs = '', i
-        , enc = encodeURIComponent
-        , push = function (k, v) {
-            qs += enc(k) + '=' + enc(v) + '&'
-          }
-  
-      if (isArray(o)) {
-        for (i = 0; o && i < o.length; i++) push(o[i].name, o[i].value)
-      } else {
-        for (var k in o) {
-          if (!Object.hasOwnProperty.call(o, k)) continue;
-          var v = o[k]
-          if (isArray(v)) {
-            for (i = 0; i < v.length; i++) push(k, v[i])
-          } else push(k, o[k])
-        }
-      }
-  
-      // spaces should be + according to spec
-      return qs.replace(/&$/, '').replace(/%20/g, '+')
-    }
-  
-    reqwest.getcallbackPrefix = function (reqId) {
-      return callbackPrefix
-    }
-  
-    // jQuery and Zepto compatibility, differences can be remapped here so you can call
-    // .ajax.compat(options, callback)
-    reqwest.compat = function (o, fn) {
-      if (o) {
-        o.type && (o.method = o.type) && delete o.type
-        o.dataType && (o.type = o.dataType)
-        o.jsonpCallback && (o.jsonpCallbackName = o.jsonpCallback) && delete o.jsonpCallback
-        o.jsonp && (o.jsonpCallback = o.jsonp)
-      }
-      return new Reqwest(o, fn)
-    }
-  
-    return reqwest
-  });
-  
-
-  provide("reqwest", module.exports);
-
-  !function ($) {
-    var r = require('reqwest')
-      , integrate = function(method) {
-          return function() {
-            var args = Array.prototype.slice.call(arguments, 0)
-              , i = (this && this.length) || 0
-            while (i--) args.unshift(this[i])
-            return r[method].apply(null, args)
-          }
-        }
-      , s = integrate('serialize')
-      , sa = integrate('serializeArray')
-  
-    $.ender({
-        ajax: r
-      , serialize: r.serialize
-      , serializeArray: r.serializeArray
-      , toQueryString: r.toQueryString
-    })
-  
-    $.ender({
-        serialize: s
-      , serializeArray: sa
-    }, true)
-  }(ender);
-  
-
-}());
 
 (function () {
 
@@ -1876,6 +1355,527 @@
   provide("underscore", module.exports);
 
   $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /*!
+    * Reqwest! A general purpose XHR connection manager
+    * (c) Dustin Diaz 2012
+    * https://github.com/ded/reqwest
+    * license MIT
+    */
+  !function (name, definition) {
+    if (typeof module != 'undefined' && module.exports) module.exports = definition()
+    else if (typeof define == 'function' && define.amd) define(definition)
+    else this[name] = definition()
+  }('reqwest', function () {
+  
+    var win = window
+      , doc = document
+      , twoHundo = /^20\d$/
+      , byTag = 'getElementsByTagName'
+      , readyState = 'readyState'
+      , contentType = 'Content-Type'
+      , requestedWith = 'X-Requested-With'
+      , head = doc[byTag]('head')[0]
+      , uniqid = 0
+      , callbackPrefix = 'reqwest_' + (+new Date())
+      , lastValue // data stored by the most recent JSONP callback
+      , xmlHttpRequest = 'XMLHttpRequest'
+  
+    var isArray = typeof Array.isArray == 'function' ? Array.isArray : function (a) {
+      return a instanceof Array
+    }
+    var defaultHeaders = {
+        contentType: 'application/x-www-form-urlencoded'
+      , requestedWith: xmlHttpRequest
+      , accept: {
+          '*':  'text/javascript, text/html, application/xml, text/xml, */*'
+        , xml:  'application/xml, text/xml'
+        , html: 'text/html'
+        , text: 'text/plain'
+        , json: 'application/json, text/javascript'
+        , js:   'application/javascript, text/javascript'
+        }
+      }
+    var xhr = win[xmlHttpRequest] ?
+      function () {
+        return new XMLHttpRequest()
+      } :
+      function () {
+        return new ActiveXObject('Microsoft.XMLHTTP')
+      }
+  
+    function handleReadyState(o, success, error) {
+      return function () {
+        if (o && o[readyState] == 4) {
+          o.onreadystatechange = undefined;
+          if (twoHundo.test(o.status)) {
+            success(o)
+          } else {
+            error(o)
+          }
+        }
+      }
+    }
+  
+    function setHeaders(http, o) {
+      var headers = o.headers || {}, h
+      headers.Accept = headers.Accept || defaultHeaders.accept[o.type] || defaultHeaders.accept['*']
+      // breaks cross-origin requests with legacy browsers
+      if (!o.crossOrigin && !headers[requestedWith]) headers[requestedWith] = defaultHeaders.requestedWith
+      if (!headers[contentType]) headers[contentType] = o.contentType || defaultHeaders.contentType
+      for (h in headers) {
+        headers.hasOwnProperty(h) && http.setRequestHeader(h, headers[h])
+      }
+    }
+  
+    function setCredentials(http, o) {
+      if (typeof o.withCredentials !== "undefined" && typeof http.withCredentials !== "undefined") {
+        http.withCredentials = !!o.withCredentials
+      }
+    }
+  
+    function generalCallback(data) {
+      lastValue = data
+    }
+  
+    function urlappend(url, s) {
+      return url + (/\?/.test(url) ? '&' : '?') + s
+    }
+  
+    function handleJsonp(o, fn, err, url) {
+      var reqId = uniqid++
+        , cbkey = o.jsonpCallback || 'callback' // the 'callback' key
+        , cbval = o.jsonpCallbackName || reqwest.getcallbackPrefix(reqId)
+        // , cbval = o.jsonpCallbackName || ('reqwest_' + reqId) // the 'callback' value
+        , cbreg = new RegExp('((^|\\?|&)' + cbkey + ')=([^&]+)')
+        , match = url.match(cbreg)
+        , script = doc.createElement('script')
+        , loaded = 0
+        , isIE10 = navigator.userAgent.indexOf('MSIE 10.0') !== -1
+  
+      if (match) {
+        if (match[3] === '?') {
+          url = url.replace(cbreg, '$1=' + cbval) // wildcard callback func name
+        } else {
+          cbval = match[3] // provided callback func name
+        }
+      } else {
+        url = urlappend(url, cbkey + '=' + cbval) // no callback details, add 'em
+      }
+  
+      win[cbval] = generalCallback
+  
+      script.type = 'text/javascript'
+      script.src = url
+      script.async = true
+      if (typeof script.onreadystatechange !== 'undefined' && !isIE10) {
+        // need this for IE due to out-of-order onreadystatechange(), binding script
+        // execution to an event listener gives us control over when the script
+        // is executed. See http://jaubourg.net/2010/07/loading-script-as-onclick-handler-of.html
+        //
+        // if this hack is used in IE10 jsonp callback are never called
+        script.event = 'onclick'
+        script.htmlFor = script.id = '_reqwest_' + reqId
+      }
+  
+      script.onload = script.onreadystatechange = function () {
+        if ((script[readyState] && script[readyState] !== 'complete' && script[readyState] !== 'loaded') || loaded) {
+          return false
+        }
+        script.onload = script.onreadystatechange = null
+        script.onclick && script.onclick()
+        // Call the user callback with the last value stored and clean up values and scripts.
+        o.success && o.success(lastValue)
+        lastValue = undefined
+        head.removeChild(script)
+        loaded = 1
+      }
+  
+      // Add the script to the DOM head
+      head.appendChild(script)
+    }
+  
+    function getRequest(o, fn, err) {
+      var method = (o.method || 'GET').toUpperCase()
+        , url = typeof o === 'string' ? o : o.url
+        // convert non-string objects to query-string form unless o.processData is false
+        , data = (o.processData !== false && o.data && typeof o.data !== 'string')
+          ? reqwest.toQueryString(o.data)
+          : (o.data || null)
+        , http
+  
+      // if we're working on a GET request and we have data then we should append
+      // query string to end of URL and not post data
+      if ((o.type == 'jsonp' || method == 'GET') && data) {
+        url = urlappend(url, data)
+        data = null
+      }
+  
+      if (o.type == 'jsonp') return handleJsonp(o, fn, err, url)
+  
+      http = xhr()
+      http.open(method, url, true)
+      setHeaders(http, o)
+      setCredentials(http, o)
+      http.onreadystatechange = handleReadyState(http, fn, err)
+      o.before && o.before(http)
+      http.send(data)
+      return http
+    }
+  
+    function Reqwest(o, fn) {
+      this.o = o
+      this.fn = fn
+  
+      init.apply(this, arguments)
+    }
+  
+    function setType(url) {
+      var m = url.match(/\.(json|jsonp|html|xml)(\?|$)/)
+      return m ? m[1] : 'js'
+    }
+  
+    function init(o, fn) {
+  
+      this.url = typeof o == 'string' ? o : o.url
+      this.timeout = null
+  
+      // whether request has been fulfilled for purpose
+      // of tracking the Promises
+      this._fulfilled = false
+      // success handlers
+      this._fulfillmentHandlers = []
+      // error handlers
+      this._errorHandlers = []
+      // complete (both success and fail) handlers
+      this._completeHandlers = []
+      this._erred = false
+      this._responseArgs = {}
+  
+      var self = this
+        , type = o.type || setType(this.url)
+  
+      fn = fn || function () {}
+  
+      if (o.timeout) {
+        this.timeout = setTimeout(function () {
+          self.abort()
+        }, o.timeout)
+      }
+  
+      if (o.success) {
+        this._fulfillmentHandlers.push(function () {
+          o.success.apply(o, arguments)
+        })
+      }
+  
+      if (o.error) {
+        this._errorHandlers.push(function () {
+          o.error.apply(o, arguments)
+        })
+      }
+  
+      if (o.complete) {
+        this._completeHandlers.push(function () {
+          o.complete.apply(o, arguments)
+        })
+      }
+  
+      function complete(resp) {
+        o.timeout && clearTimeout(self.timeout)
+        self.timeout = null
+        while (self._completeHandlers.length > 0) {
+          self._completeHandlers.shift()(resp)
+        }
+      }
+  
+      function success(resp) {
+        var r = resp.responseText
+        if (r) {
+          switch (type) {
+          case 'json':
+            try {
+              resp = win.JSON ? win.JSON.parse(r) : eval('(' + r + ')')
+            } catch (err) {
+              return error(resp, 'Could not parse JSON in response', err)
+            }
+            break;
+          case 'js':
+            resp = eval(r)
+            break;
+          case 'html':
+            resp = r
+            break;
+          case 'xml':
+            resp = resp.responseXML;
+            break;
+          }
+        }
+  
+        self._responseArgs.resp = resp
+        self._fulfilled = true
+        fn(resp)
+        while (self._fulfillmentHandlers.length > 0) {
+          self._fulfillmentHandlers.shift()(resp)
+        }
+  
+        complete(resp)
+      }
+  
+      function error(resp, msg, t) {
+        self._responseArgs.resp = resp
+        self._responseArgs.msg = msg
+        self._responseArgs.t = t
+        self._erred = true
+        while (self._errorHandlers.length > 0) {
+          self._errorHandlers.shift()(resp, msg, t)
+        }
+        complete(resp)
+      }
+  
+      this.request = getRequest(o, success, error)
+    }
+  
+    Reqwest.prototype = {
+      abort: function () {
+        this.request.abort()
+      }
+  
+    , retry: function () {
+        init.call(this, this.o, this.fn)
+      }
+  
+      /**
+       * Small deviation from the Promises A CommonJs specification
+       * http://wiki.commonjs.org/wiki/Promises/A
+       */
+  
+      /**
+       * `then` will execute upon successful requests
+       */
+    , then: function (success, fail) {
+        if (this._fulfilled) {
+          success(this._responseArgs.resp)
+        } else if (this._erred) {
+          fail(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
+        } else {
+          this._fulfillmentHandlers.push(success)
+          this._errorHandlers.push(fail)
+        }
+        return this
+      }
+  
+      /**
+       * `always` will execute whether the request succeeds or fails
+       */
+    , always: function (fn) {
+        if (this._fulfilled || this._erred) {
+          fn(this._responseArgs.resp)
+        } else {
+          this._completeHandlers.push(fn)
+        }
+        return this
+      }
+  
+      /**
+       * `fail` will execute when the request fails
+       */
+    , fail: function (fn) {
+        if (this._erred) {
+          fn(this._responseArgs.resp, this._responseArgs.msg, this._responseArgs.t)
+        } else {
+          this._errorHandlers.push(fn)
+        }
+        return this
+      }
+    }
+  
+    function reqwest(o, fn) {
+      return new Reqwest(o, fn)
+    }
+  
+    // normalize newline variants according to spec -> CRLF
+    function normalize(s) {
+      return s ? s.replace(/\r?\n/g, '\r\n') : ''
+    }
+  
+    function serial(el, cb) {
+      var n = el.name
+        , t = el.tagName.toLowerCase()
+        , optCb = function (o) {
+            // IE gives value="" even where there is no value attribute
+            // 'specified' ref: http://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-862529273
+            if (o && !o.disabled)
+              cb(n, normalize(o.attributes.value && o.attributes.value.specified ? o.value : o.text))
+          }
+  
+      // don't serialize elements that are disabled or without a name
+      if (el.disabled || !n) return;
+  
+      switch (t) {
+      case 'input':
+        if (!/reset|button|image|file/i.test(el.type)) {
+          var ch = /checkbox/i.test(el.type)
+            , ra = /radio/i.test(el.type)
+            , val = el.value;
+          // WebKit gives us "" instead of "on" if a checkbox has no value, so correct it here
+          (!(ch || ra) || el.checked) && cb(n, normalize(ch && val === '' ? 'on' : val))
+        }
+        break;
+      case 'textarea':
+        cb(n, normalize(el.value))
+        break;
+      case 'select':
+        if (el.type.toLowerCase() === 'select-one') {
+          optCb(el.selectedIndex >= 0 ? el.options[el.selectedIndex] : null)
+        } else {
+          for (var i = 0; el.length && i < el.length; i++) {
+            el.options[i].selected && optCb(el.options[i])
+          }
+        }
+        break;
+      }
+    }
+  
+    // collect up all form elements found from the passed argument elements all
+    // the way down to child elements; pass a '<form>' or form fields.
+    // called with 'this'=callback to use for serial() on each element
+    function eachFormElement() {
+      var cb = this
+        , e, i, j
+        , serializeSubtags = function (e, tags) {
+          for (var i = 0; i < tags.length; i++) {
+            var fa = e[byTag](tags[i])
+            for (j = 0; j < fa.length; j++) serial(fa[j], cb)
+          }
+        }
+  
+      for (i = 0; i < arguments.length; i++) {
+        e = arguments[i]
+        if (/input|select|textarea/i.test(e.tagName)) serial(e, cb)
+        serializeSubtags(e, [ 'input', 'select', 'textarea' ])
+      }
+    }
+  
+    // standard query string style serialization
+    function serializeQueryString() {
+      return reqwest.toQueryString(reqwest.serializeArray.apply(null, arguments))
+    }
+  
+    // { 'name': 'value', ... } style serialization
+    function serializeHash() {
+      var hash = {}
+      eachFormElement.apply(function (name, value) {
+        if (name in hash) {
+          hash[name] && !isArray(hash[name]) && (hash[name] = [hash[name]])
+          hash[name].push(value)
+        } else hash[name] = value
+      }, arguments)
+      return hash
+    }
+  
+    // [ { name: 'name', value: 'value' }, ... ] style serialization
+    reqwest.serializeArray = function () {
+      var arr = []
+      eachFormElement.apply(function (name, value) {
+        arr.push({name: name, value: value})
+      }, arguments)
+      return arr
+    }
+  
+    reqwest.serialize = function () {
+      if (arguments.length === 0) return ''
+      var opt, fn
+        , args = Array.prototype.slice.call(arguments, 0)
+  
+      opt = args.pop()
+      opt && opt.nodeType && args.push(opt) && (opt = null)
+      opt && (opt = opt.type)
+  
+      if (opt == 'map') fn = serializeHash
+      else if (opt == 'array') fn = reqwest.serializeArray
+      else fn = serializeQueryString
+  
+      return fn.apply(null, args)
+    }
+  
+    reqwest.toQueryString = function (o) {
+      var qs = '', i
+        , enc = encodeURIComponent
+        , push = function (k, v) {
+            qs += enc(k) + '=' + enc(v) + '&'
+          }
+  
+      if (isArray(o)) {
+        for (i = 0; o && i < o.length; i++) push(o[i].name, o[i].value)
+      } else {
+        for (var k in o) {
+          if (!Object.hasOwnProperty.call(o, k)) continue;
+          var v = o[k]
+          if (isArray(v)) {
+            for (i = 0; i < v.length; i++) push(k, v[i])
+          } else push(k, o[k])
+        }
+      }
+  
+      // spaces should be + according to spec
+      return qs.replace(/&$/, '').replace(/%20/g, '+')
+    }
+  
+    reqwest.getcallbackPrefix = function (reqId) {
+      return callbackPrefix
+    }
+  
+    // jQuery and Zepto compatibility, differences can be remapped here so you can call
+    // .ajax.compat(options, callback)
+    reqwest.compat = function (o, fn) {
+      if (o) {
+        o.type && (o.method = o.type) && delete o.type
+        o.dataType && (o.type = o.dataType)
+        o.jsonpCallback && (o.jsonpCallbackName = o.jsonpCallback) && delete o.jsonpCallback
+        o.jsonp && (o.jsonpCallback = o.jsonp)
+      }
+      return new Reqwest(o, fn)
+    }
+  
+    return reqwest
+  });
+  
+
+  provide("reqwest", module.exports);
+
+  !function ($) {
+    var r = require('reqwest')
+      , integrate = function(method) {
+          return function() {
+            var args = Array.prototype.slice.call(arguments, 0)
+              , i = (this && this.length) || 0
+            while (i--) args.unshift(this[i])
+            return r[method].apply(null, args)
+          }
+        }
+      , s = integrate('serialize')
+      , sa = integrate('serializeArray')
+  
+    $.ender({
+        ajax: r
+      , serialize: r.serialize
+      , serializeArray: r.serializeArray
+      , toQueryString: r.toQueryString
+    })
+  
+    $.ender({
+        serialize: s
+      , serializeArray: sa
+    }, true)
+  }(ender);
+  
 
 }());
 
@@ -4497,355 +4497,2238 @@
 
   var module = { exports: {} }, exports = module.exports;
 
-  
-  /**
-   * This module offers the internal "keypress" functionality from node-core's
-   * `readline` module, for your own programs and modules to use.
-   *
-   * Usage:
-   *
-   *   require('keypress')(process.stdin);
-   *
-   *   process.stdin.on('keypress', function (ch, key) {
-   *     console.log(ch, key);
-   *     if (key.ctrl && key.name == 'c') {
-   *       process.stdin.pause();
-   *     }
-   *   });
-   *   proces.stdin.resume();
-   */
-  var exports = module.exports = keypress;
-  
-  exports.enableMouse = function (stream) {
-    stream.write('\x1b' +'[?1000h')
-  }
-  
-  exports.disableMouse = function (stream) {
-    stream.write('\x1b' +'[?1000l')
-  }
-  
-  
-  /**
-   * accepts a readable Stream instance and makes it emit "keypress" events
-   */
-  
-  function keypress(stream) {
-    if (isEmittingKeypress(stream)) return;
-    stream._emitKeypress = true;
-  
-    function onData(b) {
-      if (stream.listeners('keypress').length > 0) {
-        emitKey(stream, b);
-      } else {
-        // Nobody's watching anyway
-        stream.removeListener('data', onData);
-        stream.on('newListener', onNewListener);
-      }
-    }
-  
-    function onNewListener(event) {
-      if (event == 'keypress') {
-        stream.on('data', onData);
-        stream.removeListener('newListener', onNewListener);
-      }
-    }
-  
-    if (stream.listeners('keypress').length > 0) {
-      stream.on('data', onData);
-    } else {
-      stream.on('newListener', onNewListener);
-    }
-  }
-  
-  /**
-   * Returns `true` if the stream is already emitting "keypress" events.
-   * `false` otherwise.
-   */
-  
-  function isEmittingKeypress(stream) {
-    var rtn = stream._emitKeypress;
-    if (!rtn) {
-      // hack: check for the v0.6.x "data" event
-      stream.listeners('data').forEach(function (l) {
-        if (l.name == 'onData' && /emitKey/.test(l.toString())) {
-          rtn = true;
-          stream._emitKeypress = true;
+  /*global provide:true,ender:true*/
+  // make a fake `ender` that can do some things slightly different
+  !(function ($) {
+    var faker = function (selector) {
+          return selector === null || selector === '#' ? $([]) : $.apply(this, arguments)
         }
-      });
+      , hasNewBean = !!require('bean').on
+      , _$map = $.fn.map
+      , _$on = $.fn.on
+      , _$trigger = $.fn.trigger
+      , _$data = $.fn.data
+      , p
+  
+    for (p in $) {
+      if (Object.prototype.hasOwnProperty.call($, p))
+        faker[p] = $[p]
     }
-    if (!rtn) {
-      // hack: check for the v0.6.x "newListener" event
-      stream.listeners('newListener').forEach(function (l) {
-        if (l.name == 'onNewListener' && /keypress/.test(l.toString())) {
-          rtn = true;
-          stream._emitKeypress = true;
+    if (!faker.support) faker.support = {}
+  
+    // $.camelCase
+    faker.camelCase = function (s) {
+      return s.replace(/-([a-z]|[0-9])/ig, function (s, c) { return (c + '').toUpperCase() })
+    }
+    // $.extend(dst, src1, src2...)
+    // simple shallow copy
+    faker.extend = function () {
+      var options, name, src, copy
+        , target = arguments[0], i = 1, length = arguments.length
+  
+      for (; i < length; i++) {
+        if ((options = arguments[i]) !== null) {
+          for (name in options) {
+            src = target[name]
+            copy = options[name]
+            if (target !== copy)
+              target[name] = copy
+          }
         }
-      });
+      }
+      return target
     }
-    return rtn;
-  }
+    // $.map
+    faker.map = function (a, fn, scope) {
+      var r = [], tr, i, l
+      for (i = 0, l = a.length; i < l; i++) {
+        i in a && (tr = fn.call(scope, a[i], i, a)) != null && r.push(tr)
+      }
+      return r
+    }
+    // $.proxy
+    faker.proxy = function (fn, ctx) {
+      return function () { return fn.apply(ctx, arguments) }
+    }
+    // simplified version of jQuery's $.grep
+    faker.grep = function (elems, callback) {
+      var i = 0, l = elems.length, ret = []
+      for (; i < l; i++) {
+        if (!!callback(elems[i], i))
+          ret.push(elems[i])
+      }
+      return ret;
+    }
+    // no index arg needed just yet
+    faker.inArray = Array.prototype.indexOf
+      ? function (el, arr) {
+          return Array.prototype.indexOf.call(arr, el)
+        }
+      : function (el, arr) {
+          for (var i = 0; i < arr.length; i++)
+            if (arr[i] === el) return i
+          return -1
+        }
   
+    // this is just nasty... Bootstrap uses $.Event(foo) so it can track state, we can't do that
+    // with Bean but we need to pass Bean a string for trigger()
+    faker.Event = function (s) {
+      return s
+    }
   
-  /*
-    Some patterns seen in terminal key escape codes, derived from combos seen
-    at http://www.midnight-commander.org/browser/lib/tty/key.c
-  
-    ESC letter
-    ESC [ letter
-    ESC [ modifier letter
-    ESC [ 1 ; modifier letter
-    ESC [ num char
-    ESC [ num ; modifier char
-    ESC O letter
-    ESC O modifier letter
-    ESC O 1 ; modifier letter
-    ESC N letter
-    ESC [ [ num ; modifier char
-    ESC [ [ 1 ; modifier letter
-    ESC ESC [ num char
-    ESC ESC O letter
-  
-    - char is usually ~ but $ and ^ also happen with rxvt
-    - modifier is 1 +
-                  (shift     * 1) +
-                  (left_alt  * 2) +
-                  (ctrl      * 4) +
-                  (right_alt * 8)
-    - two leading ESCs apparently mean the same as one leading ESC
-  */
-  
-  // Regexes used for ansi escape code splitting
-  var metaKeyCodeRe = /^(?:\x1b)([a-zA-Z0-9])$/;
-  var functionKeyCodeRe =
-      /^(?:\x1b+)(O|N|\[|\[\[)(?:(\d+)(?:;(\d+))?([~^$])|(?:1;)?(\d+)?([a-zA-Z]))/;
-  
-  function emitKey(stream, s) {
-    var ch,
-        key = {
-          name: undefined,
-          ctrl: false,
-          meta: false,
-          shift: false
-        },
-        parts;
-  
-    if (Buffer.isBuffer(s)) {
-      if (s[0] > 127 && s[1] === undefined) {
-        s[0] -= 128;
-        s = '\x1b' + s.toString(stream.encoding || 'utf-8');
-      } else {
-        s = s.toString(stream.encoding || 'utf-8');
+    // fix $().map to handle argument-less functions
+    // also the explicit rejection of null values
+    $.fn.map = function (fn) {
+      if (!fn.length) { // no args
+        return $(_$map.call(this, function (e) { return fn.call(e) }, function (e) { return e != null }))
+      }
+      return $(_$map.apply(this, arguments))
+    }
+    // fix $().on to handle jQuery style arguments
+    $.fn.on = function () {
+      // 'data' argument, can't use it, perhaps pass it as last arg?
+      if (arguments.length == 3 && typeof arguments[2] == 'function' && typeof arguments[1] != 'string')
+        return $.fn.bind.call(this, arguments[0], arguments[2])
+      // this argument switch only needs to happen for old Bean
+      else if (!hasNewBean && arguments.length == 3 && typeof arguments[2] == 'function' && typeof arguments[1] == 'string')
+        return $.fn.bind.call(this, arguments[1], arguments[0], arguments[2])
+      return _$on.apply(this, arguments)
+    }
+    // don't handle $().trigger({}) (object parameters)
+    $.fn.trigger = function () {
+      if (typeof arguments[0] == 'string')
+        return _$trigger.apply(this, arguments)
+      if (typeof arguments[0] == 'object' && typeof arguments[0].type == 'string')
+        return _$trigger.call(this, arguments[0].type)
+      return this
+    }
+    // fix $().data() to handle a JSON array for typeahead's "source"
+    $.fn.data = function () {
+      var d = _$data.apply(this, arguments)
+      if (!arguments.length && typeof d.source == 'string' && /^\[/.test(d.source)) {
+        if (typeof JSON != 'undefined' && JSON.parse) {
+          d.source = JSON.parse(d.source)
+        } else {
+          d.source = d.source.replace(/(^\s*[\s*")|("\s*]\s*$)/g, '').split(/"\s*,\s*"/)
+        }
+      }
+      return d
+    }
+    // implement sort which is awkward because Array.prototype.sort won't sort an Ender object
+    $.fn.sort = function (fn) {
+      var ar = []
+      for (var i = 0; i < this.length; i++) ar[i] = this[i]
+      ar.sort(fn)
+      return $(ar)
+    }
+    // for carousel.to()
+    if (!$.fn.index) {
+      //TODO: support collections of elements for dropdown.js, move implementation to Traversty
+      $.fn.index = function (el) {
+        if (el && (!!el.nodeType || (!!(el = el[0]) && !!el.nodeType))) {
+          for (var i = 0, l = this.length; i < l; i++) {
+            if (this[i] === el) return i
+          }
+        }
+        return -1
       }
     }
   
-    key.sequence = s;
+    // lifted from jQuery, modified slightly
+    var rroot = /^(?:body|html)$/i
+    $.fn.position = function () {
+      if (!this.length)
+        return null
   
-    if (s === '\r' || s === '\n') {
-      // enter
-      key.name = 'enter';
+      var elem = this[0],
+      // Get *real* offsetParent
+      offsetParent = this.offsetParent(),
   
-    } else if (s === '\t') {
-      // tab
-      key.name = 'tab';
+      // Get correct offsets
+      offset       = this.offset(),
+      parentOffset = rroot.test(offsetParent[0].nodeName) ? { top: 0, left: 0 } : offsetParent.offset()
   
-    } else if (s === '\b' || s === '\x7f' ||
-               s === '\x1b\x7f' || s === '\x1b\b') {
-      // backspace or ctrl+h
-      key.name = 'backspace';
-      key.meta = (s.charAt(0) === '\x1b');
+      // Subtract element margins
+      // note: when an element has margin: auto the offsetLeft and marginLeft
+      // are the same in Safari causing offset.left to incorrectly be 0
+      offset.top  -= parseFloat($(elem).css("marginTop")) || 0
+      offset.left -= parseFloat($(elem).css("marginLeft")) || 0
   
-    } else if (s === '\x1b' || s === '\x1b\x1b') {
-      // escape key
-      key.name = 'escape';
-      key.meta = (s.length === 2);
+      // Add offsetParent borders
+      parentOffset.top  += parseFloat($(offsetParent[0]).css("borderTopWidth")) || 0
+      parentOffset.left += parseFloat($(offsetParent[0]).css("borderLeftWidth")) || 0
   
-    } else if (s === ' ' || s === '\x1b ') {
-      key.name = 'space';
-      key.meta = (s.length === 2);
-  
-    } else if (s <= '\x1a') {
-      // ctrl+letter
-      key.name = String.fromCharCode(s.charCodeAt(0) + 'a'.charCodeAt(0) - 1);
-      key.ctrl = true;
-  
-    } else if (s.length === 1 && s >= 'a' && s <= 'z') {
-      // lowercase letter
-      key.name = s;
-  
-    } else if (s.length === 1 && s >= 'A' && s <= 'Z') {
-      // shift+letter
-      key.name = s.toLowerCase();
-      key.shift = true;
-  
-    } else if (parts = metaKeyCodeRe.exec(s)) {
-      // meta+character key
-      key.name = parts[1].toLowerCase();
-      key.meta = true;
-      key.shift = /^[A-Z]$/.test(parts[1]);
-  
-    } else if (parts = functionKeyCodeRe.exec(s)) {
-      // ansi escape sequence
-  
-      // reassemble the key code leaving out leading \x1b's,
-      // the modifier key bitflag and any meaningless "1;" sequence
-      var code = (parts[1] || '') + (parts[2] || '') +
-                 (parts[4] || '') + (parts[6] || ''),
-          modifier = (parts[3] || parts[5] || 1) - 1;
-  
-      // Parse the key modifier
-      key.ctrl = !!(modifier & 4);
-      key.meta = !!(modifier & 10);
-      key.shift = !!(modifier & 1);
-      key.code = code;
-  
-      // Parse the key itself
-      switch (code) {
-        /* xterm/gnome ESC O letter */
-        case 'OP': key.name = 'f1'; break;
-        case 'OQ': key.name = 'f2'; break;
-        case 'OR': key.name = 'f3'; break;
-        case 'OS': key.name = 'f4'; break;
-  
-        /* xterm/rxvt ESC [ number ~ */
-        case '[11~': key.name = 'f1'; break;
-        case '[12~': key.name = 'f2'; break;
-        case '[13~': key.name = 'f3'; break;
-        case '[14~': key.name = 'f4'; break;
-  
-        /* from Cygwin and used in libuv */
-        case '[[A': key.name = 'f1'; break;
-        case '[[B': key.name = 'f2'; break;
-        case '[[C': key.name = 'f3'; break;
-        case '[[D': key.name = 'f4'; break;
-        case '[[E': key.name = 'f5'; break;
-  
-        /* common */
-        case '[15~': key.name = 'f5'; break;
-        case '[17~': key.name = 'f6'; break;
-        case '[18~': key.name = 'f7'; break;
-        case '[19~': key.name = 'f8'; break;
-        case '[20~': key.name = 'f9'; break;
-        case '[21~': key.name = 'f10'; break;
-        case '[23~': key.name = 'f11'; break;
-        case '[24~': key.name = 'f12'; break;
-  
-        /* xterm ESC [ letter */
-        case '[A': key.name = 'up'; break;
-        case '[B': key.name = 'down'; break;
-        case '[C': key.name = 'right'; break;
-        case '[D': key.name = 'left'; break;
-        case '[E': key.name = 'clear'; break;
-        case '[F': key.name = 'end'; break;
-        case '[H': key.name = 'home'; break;
-  
-        /* xterm/gnome ESC O letter */
-        case 'OA': key.name = 'up'; break;
-        case 'OB': key.name = 'down'; break;
-        case 'OC': key.name = 'right'; break;
-        case 'OD': key.name = 'left'; break;
-        case 'OE': key.name = 'clear'; break;
-        case 'OF': key.name = 'end'; break;
-        case 'OH': key.name = 'home'; break;
-  
-        /* xterm/rxvt ESC [ number ~ */
-        case '[1~': key.name = 'home'; break;
-        case '[2~': key.name = 'insert'; break;
-        case '[3~': key.name = 'delete'; break;
-        case '[4~': key.name = 'end'; break;
-        case '[5~': key.name = 'pageup'; break;
-        case '[6~': key.name = 'pagedown'; break;
-  
-        /* putty */
-        case '[[5~': key.name = 'pageup'; break;
-        case '[[6~': key.name = 'pagedown'; break;
-  
-        /* rxvt */
-        case '[7~': key.name = 'home'; break;
-        case '[8~': key.name = 'end'; break;
-  
-        /* rxvt keys with modifiers */
-        case '[a': key.name = 'up'; key.shift = true; break;
-        case '[b': key.name = 'down'; key.shift = true; break;
-        case '[c': key.name = 'right'; key.shift = true; break;
-        case '[d': key.name = 'left'; key.shift = true; break;
-        case '[e': key.name = 'clear'; key.shift = true; break;
-  
-        case '[2$': key.name = 'insert'; key.shift = true; break;
-        case '[3$': key.name = 'delete'; key.shift = true; break;
-        case '[5$': key.name = 'pageup'; key.shift = true; break;
-        case '[6$': key.name = 'pagedown'; key.shift = true; break;
-        case '[7$': key.name = 'home'; key.shift = true; break;
-        case '[8$': key.name = 'end'; key.shift = true; break;
-  
-        case 'Oa': key.name = 'up'; key.ctrl = true; break;
-        case 'Ob': key.name = 'down'; key.ctrl = true; break;
-        case 'Oc': key.name = 'right'; key.ctrl = true; break;
-        case 'Od': key.name = 'left'; key.ctrl = true; break;
-        case 'Oe': key.name = 'clear'; key.ctrl = true; break;
-  
-        case '[2^': key.name = 'insert'; key.ctrl = true; break;
-        case '[3^': key.name = 'delete'; key.ctrl = true; break;
-        case '[5^': key.name = 'pageup'; key.ctrl = true; break;
-        case '[6^': key.name = 'pagedown'; key.ctrl = true; break;
-        case '[7^': key.name = 'home'; key.ctrl = true; break;
-        case '[8^': key.name = 'end'; key.ctrl = true; break;
-  
-        /* misc. */
-        case '[Z': key.name = 'tab'; key.shift = true; break;
-        default: key.name = 'undefined'; break;
-  
-      }
-    } else if (s.length > 1 && s[0] !== '\x1b') {
-      // Got a longer-than-one string of characters.
-      // Probably a paste, since it wasn't a control sequence.
-      Array.prototype.forEach.call(s, function(c) {
-        emitKey(stream, c);
-      });
-      return;
-    }
-  
-    if (key.code == '[M') {
-      key.name = 'mouse';
-      var s = key.sequence;
-      var b = s.charCodeAt(3);
-      key.x = s.charCodeAt(4) - 040;
-      key.y = s.charCodeAt(5) - 040;
-  
-      key.scroll = 0;
-  
-      key.ctrl  = !!(1<<4 & b);
-      key.meta  = !!(1<<3 & b);
-      key.shift = !!(1<<2 & b);
-  
-      key.release = (3 & b) === 3;
-  
-      if (1<<6 & b) { //scroll
-        key.scroll = 1 & b ? 1 : -1;
-      }
-  
-      if (!key.release && !key.scroll) {
-        key.button = b & 3;
+      // Subtract the two offsets
+      return {
+          top:  offset.top  - parentOffset.top
+        , left: offset.left - parentOffset.left
       }
     }
-  
-    // Don't emit a key if no name was found
-    if (key.name === undefined) {
-      key = undefined;
+    $.fn.offsetParent = function () {
+      return $(this.map(function () {
+        var offsetParent = this.offsetParent || document.body
+        while (offsetParent && (!rroot.test(offsetParent.nodeName) && $(offsetParent).css("position") === "static")) {
+          offsetParent = offsetParent.offsetParent
+        }
+        return offsetParent
+      }))
     }
   
-    if (s.length === 1) {
-      ch = s;
-    }
+    // if (typeof module !== 'undefined') module.exports = faker
+    if (typeof provide !== 'undefined') provide('ender-bootstrap-base-faker', faker)
+    // else, where are we??
   
-    if (key && key.name == 'mouse') {
-      stream.emit('mousepress', key)
-    } else if (key || ch) {
-      stream.emit('keypress', ch, key);
-    }
-  }
+  
+  }(ender))
   
 
-  provide("keypress", module.exports);
+  provide("ender-bootstrap-base", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ===================================================
+   * bootstrap-transition.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#transitions
+   * ===================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ========================================================== */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+    /* CSS TRANSITION SUPPORT (http://www.modernizr.com/)
+     * ======================================================= */
+  
+    $.domReady(function () {
+  
+      $.support.transition = (function () {
+  
+        var transitionEnd = (function () {
+  
+          var el = document.createElement('bootstrap')
+            , transEndEventNames = {
+                 'WebkitTransition' : 'webkitTransitionEnd'
+              ,  'MozTransition'    : 'transitionend'
+              ,  'OTransition'      : 'oTransitionEnd otransitionend'
+              ,  'transition'       : 'transitionend'
+              }
+            , name
+  
+          for (name in transEndEventNames){
+            if (el.style[name] !== undefined) {
+              return transEndEventNames[name]
+            }
+          }
+  
+        }())
+  
+        return transitionEnd && {
+          end: transitionEnd
+        }
+  
+      })()
+  
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-transition", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ==========================================================
+   * bootstrap-alert.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#alerts
+   * ==========================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ========================================================== */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* ALERT CLASS DEFINITION
+    * ====================== */
+  
+    var dismiss = '[data-dismiss="alert"]'
+      , Alert = function (el) {
+          $(el).on('click', dismiss, this.close)
+        }
+  
+    Alert.prototype.close = function (e) {
+      var $this = $(this)
+        , selector = $this.attr('data-target')
+        , $parent
+  
+      if (!selector) {
+        selector = $this.attr('href')
+        selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
+      }
+  
+      $parent = $(selector)
+  
+      e && e.preventDefault()
+  
+      $parent.length || ($parent = $this.hasClass('alert') ? $this : $this.parent())
+  
+      $parent.trigger(e = $.Event('close'))
+  
+      if (false) return
+  
+      $parent.removeClass('in')
+  
+      function removeElement() {
+        $parent
+          .trigger('closed')
+          .remove()
+      }
+  
+      $.support.transition && $parent.hasClass('fade') ?
+        $parent.on($.support.transition.end, removeElement) :
+        removeElement()
+    }
+  
+  
+   /* ALERT PLUGIN DEFINITION
+    * ======================= */
+  
+    $.fn.alert = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('alert')
+        if (!data) $this.data('alert', (data = new Alert(this)))
+        if (typeof option == 'string') data[option].call($this)
+      })
+    }
+  
+    $.fn.alert.Constructor = Alert
+  
+  
+   /* ALERT DATA-API
+    * ============== */
+  
+    $(document).on('click.alert.data-api', dismiss, Alert.prototype.close)
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-alert", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ============================================================
+   * bootstrap-button.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#buttons
+   * ============================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ============================================================ */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* BUTTON PUBLIC CLASS DEFINITION
+    * ============================== */
+  
+    var Button = function (element, options) {
+      this.$element = $(element)
+      this.options = $.extend({}, $.fn.button.defaults, options)
+    }
+  
+    Button.prototype.setState = function (state) {
+      var d = 'disabled'
+        , $el = this.$element
+        , data = $el.data()
+        , val = $el.is('input') ? 'val' : 'html'
+  
+      state = state + 'Text'
+      data.resetText || $el.data('resetText', $el[val]())
+  
+      $el[val](data[state] || this.options[state])
+  
+      // push to event loop to allow forms to submit
+      setTimeout(function () {
+        state == 'loadingText' ?
+          $el.addClass(d).attr(d, d) :
+          $el.removeClass(d).removeAttr(d)
+      }, 0)
+    }
+  
+    Button.prototype.toggle = function () {
+      var $parent = this.$element.closest('[data-toggle="buttons-radio"]')
+  
+      $parent && $(this.$element.parent()).data('toggle') == 'buttons-radio' && $parent.find('.active').removeClass('active')
+  
+      this.$element.toggleClass('active')
+    }
+  
+  
+   /* BUTTON PLUGIN DEFINITION
+    * ======================== */
+  
+    $.fn.button = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('button')
+          , options = typeof option == 'object' && option
+        if (!data) $this.data('button', (data = new Button(this, options)))
+        if (option == 'toggle') data.toggle()
+        else if (option) data.setState(option)
+      })
+    }
+  
+    $.fn.button.defaults = {
+      loadingText: 'loading...'
+    }
+  
+    $.fn.button.Constructor = Button
+  
+  
+   /* BUTTON DATA-API
+    * =============== */
+  
+    $(document).on('click.button.data-api', '[data-toggle^=button]', function (e) {
+      var $btn = $(e.target)
+      if (!$btn.hasClass('btn')) $btn = $btn.closest('.btn')
+      $btn.button('toggle')
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-button", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ==========================================================
+   * bootstrap-carousel.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#carousel
+   * ==========================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ========================================================== */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* CAROUSEL CLASS DEFINITION
+    * ========================= */
+  
+    var Carousel = function (element, options) {
+      this.$element = $(element)
+      this.options = options
+      this.options.slide && this.slide(this.options.slide)
+      this.options.pause == 'hover' && this.$element
+        .on('mouseenter', $.proxy(this.pause, this))
+        .on('mouseleave', $.proxy(this.cycle, this))
+    }
+  
+    Carousel.prototype = {
+  
+      cycle: function (e) {
+        if (!e) this.paused = false
+        this.options.interval
+          && !this.paused
+          && (this.interval = setInterval($.proxy(this.next, this), this.options.interval))
+        return this
+      }
+  
+    , to: function (pos) {
+        var $active = this.$element.find('.item.active')
+          , children = $active.parent().children()
+          , activePos = children.index($active)
+          , that = this
+  
+        if (pos > (children.length - 1) || pos < 0) return
+  
+        if (this.sliding) {
+          return this.$element.one('slid', function () {
+            that.to(pos)
+          })
+        }
+  
+        if (activePos == pos) {
+          return this.pause().cycle()
+        }
+  
+        return this.slide(pos > activePos ? 'next' : 'prev', $(children[pos]))
+      }
+  
+    , pause: function (e) {
+        if (!e) this.paused = true
+        if (this.$element.find('.next, .prev').length && $.support.transition.end) {
+          this.$element.trigger($.support.transition.end)
+          this.cycle()
+        }
+        clearInterval(this.interval)
+        this.interval = null
+        return this
+      }
+  
+    , next: function () {
+        if (this.sliding) return
+        return this.slide('next')
+      }
+  
+    , prev: function () {
+        if (this.sliding) return
+        return this.slide('prev')
+      }
+  
+    , slide: function (type, next) {
+        var $active = this.$element.find('.item.active')
+          , $next = next || $active[type]()
+          , isCycling = this.interval
+          , direction = type == 'next' ? 'left' : 'right'
+          , fallback  = type == 'next' ? 'first' : 'last'
+          , that = this
+          , e
+  
+        this.sliding = true
+  
+        isCycling && this.pause()
+  
+        $next = $next.length ? $next : this.$element.find('.item')[fallback]()
+  
+        e = $.Event('slide', {
+          relatedTarget: $next[0]
+        })
+  
+        if ($next.hasClass('active')) return
+  
+        if ($.support.transition && this.$element.hasClass('slide')) {
+          this.$element.trigger(e)
+          if (false) return
+          $next.addClass(type)
+          $next[0].offsetWidth // force reflow
+          $active.addClass(direction)
+          $next.addClass(direction)
+          this.$element.one($.support.transition.end, function () {
+            $next.removeClass([type, direction].join(' ')).addClass('active')
+            $active.removeClass(['active', direction].join(' '))
+            that.sliding = false
+            setTimeout(function () { that.$element.trigger('slid') }, 0)
+          })
+        } else {
+          this.$element.trigger(e)
+          if (false) return
+          $active.removeClass('active')
+          $next.addClass('active')
+          this.sliding = false
+          this.$element.trigger('slid')
+        }
+  
+        isCycling && this.cycle()
+  
+        return this
+      }
+  
+    }
+  
+  
+   /* CAROUSEL PLUGIN DEFINITION
+    * ========================== */
+  
+    $.fn.carousel = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('carousel')
+          , options = $.extend({}, $.fn.carousel.defaults, typeof option == 'object' && option)
+          , action = typeof option == 'string' ? option : options.slide
+        if (!data) $this.data('carousel', (data = new Carousel(this, options)))
+        if (typeof option == 'number') data.to(option)
+        else if (action) data[action]()
+        else if (options.interval) data.cycle()
+      })
+    }
+  
+    $.fn.carousel.defaults = {
+      interval: 5000
+    , pause: 'hover'
+    }
+  
+    $.fn.carousel.Constructor = Carousel
+  
+  
+   /* CAROUSEL DATA-API
+    * ================= */
+  
+    $(document).on('click.carousel.data-api', '[data-slide]', function (e) {
+      var $this = $(this), href
+        , $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
+        , options = $.extend({}, $target.data(), $this.data())
+      $target.carousel(options)
+      e.preventDefault()
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-carousel", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* =============================================================
+   * bootstrap-collapse.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#collapse
+   * =============================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ============================================================ */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* COLLAPSE PUBLIC CLASS DEFINITION
+    * ================================ */
+  
+    var Collapse = function (element, options) {
+      this.$element = $(element)
+      this.options = $.extend({}, $.fn.collapse.defaults, options)
+  
+      if (this.options.parent) {
+        this.$parent = $(this.options.parent)
+      }
+  
+      this.options.toggle && this.toggle()
+    }
+  
+    Collapse.prototype = {
+  
+      constructor: Collapse
+  
+    , dimension: function () {
+        var hasWidth = this.$element.hasClass('width')
+        return hasWidth ? 'width' : 'height'
+      }
+  
+    , show: function () {
+        var dimension
+          , scroll
+          , actives
+          , hasData
+  
+        if (this.transitioning) return
+  
+        dimension = this.dimension()
+        scroll = $.camelCase(['scroll', dimension].join('-'))
+        actives = this.$parent && this.$parent.find('> .accordion-group > .in')
+  
+        if (actives && actives.length) {
+          hasData = actives.data('collapse')
+          if (hasData && hasData.transitioning) return
+          actives.collapse('hide')
+          hasData || actives.data('collapse', null)
+        }
+  
+        this.$element[dimension](0)
+        this.transition('addClass', $.Event('show'), 'shown')
+        $.support.transition && this.$element[dimension](this.$element[0][scroll])
+      }
+  
+    , hide: function () {
+        var dimension
+        if (this.transitioning) return
+        dimension = this.dimension()
+        this.reset(this.$element[dimension]())
+        this.transition('removeClass', $.Event('hide'), 'hidden')
+        this.$element[dimension](0)
+      }
+  
+    , reset: function (size) {
+        var dimension = this.dimension()
+  
+        this.$element
+          .removeClass('collapse')
+          [dimension](size || 'auto')
+          [0].offsetWidth
+  
+        this.$element[size !== null ? 'addClass' : 'removeClass']('collapse')
+  
+        return this
+      }
+  
+    , transition: function (method, startEvent, completeEvent) {
+        var that = this
+          , complete = function () {
+              if (startEvent == "show") that.reset()
+              that.transitioning = 0
+              that.$element.trigger(completeEvent)
+            }
+  
+        this.$element.trigger(startEvent)
+  
+        if (false) return
+  
+        this.transitioning = 1
+  
+        this.$element[method]('in')
+  
+        $.support.transition && this.$element.hasClass('collapse') ?
+          this.$element.one($.support.transition.end, complete) :
+          complete()
+      }
+  
+    , toggle: function () {
+        this[this.$element.hasClass('in') ? 'hide' : 'show']()
+      }
+  
+    }
+  
+  
+   /* COLLAPSIBLE PLUGIN DEFINITION
+    * ============================== */
+  
+    $.fn.collapse = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('collapse')
+          , options = typeof option == 'object' && option
+        if (!data) $this.data('collapse', (data = new Collapse(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+  
+    $.fn.collapse.defaults = {
+      toggle: true
+    }
+  
+    $.fn.collapse.Constructor = Collapse
+  
+  
+   /* COLLAPSIBLE DATA-API
+    * ==================== */
+  
+    $(document).on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
+      var $this = $(this), href
+        , target = $this.attr('data-target')
+          || e.preventDefault()
+          || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') //strip for ie7
+        , option = $(target).data('collapse') ? 'toggle' : $this.data()
+      $this[$(target).hasClass('in') ? 'addClass' : 'removeClass']('collapsed')
+      $(target).collapse(option)
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-collapse", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ============================================================
+   * bootstrap-dropdown.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#dropdowns
+   * ============================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ============================================================ */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* DROPDOWN CLASS DEFINITION
+    * ========================= */
+  
+    var toggle = '[data-toggle=dropdown]'
+      , Dropdown = function (element) {
+          var $el = $(element).on('click.dropdown.data-api', this.toggle)
+          $('html').on('click.dropdown.data-api', function () {
+            $el.parent().removeClass('open')
+          })
+        }
+  
+    Dropdown.prototype = {
+  
+      constructor: Dropdown
+  
+    , toggle: function (e) {
+        var $this = $(this)
+          , $parent
+          , isActive
+  
+        if ($this.is('.disabled')) return
+  
+        $parent = getParent($this)
+  
+        isActive = $parent.hasClass('open')
+  
+        clearMenus()
+  
+        if (!isActive) {
+          $parent.toggleClass('open')
+          $this.focus()
+        }
+  
+        e.stop()
+      }
+  
+    , keydown: function (e) {
+        var $this
+          , $items
+          , $active
+          , $parent
+          , isActive
+          , index
+  
+        if (!/(38|40|27)/.test(e.keyCode)) return
+  
+        $this = $(this)
+  
+        e.preventDefault()
+        e.stopPropagation()
+  
+        if ($this.is('.disabled, :disabled')) return
+  
+        $parent = getParent($this)
+  
+        isActive = $parent.hasClass('open')
+  
+        if (!isActive || (isActive && e.keyCode == 27)) return $this.click()
+  
+        $items = $('[role=menu] li:not(.divider) a', $parent)
+  
+        if (!$items.length) return
+  
+        index = $items.index($items.filter(':focus'))
+  
+        if (e.keyCode == 38 && index > 0) index--                                        // up
+        if (e.keyCode == 40 && index < $items.length - 1) index++                        // down
+        if (!~index) index = 0
+  
+        $items
+          .eq(index)
+          .focus()
+      }
+  
+    }
+  
+    function clearMenus() {
+      $(toggle).each(function () {
+        getParent($(this)).removeClass('open')
+      })
+    }
+  
+    function getParent($this) {
+      var selector = $this.attr('data-target')
+        , $parent
+  
+      if (!selector) {
+        selector = $this.attr('href')
+        selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
+      }
+  
+      $parent = $(selector)
+      $parent.length || ($parent = $this.parent())
+  
+      return $parent
+    }
+  
+  
+    /* DROPDOWN PLUGIN DEFINITION
+     * ========================== */
+  
+    $.fn.dropdown = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('dropdown')
+        if (!data) $this.data('dropdown', (data = new Dropdown(this)))
+        if (typeof option == 'string') data[option].call($this)
+      })
+    }
+  
+    $.fn.dropdown.Constructor = Dropdown
+  
+  
+    /* APPLY TO STANDARD DROPDOWN ELEMENTS
+     * =================================== */
+  
+    $(document)
+      .on('click.dropdown.data-api touchstart.dropdown.data-api', clearMenus)
+      .on('click.dropdown touchstart.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
+      .on('click.dropdown.data-api touchstart.dropdown.data-api'  , toggle, Dropdown.prototype.toggle)
+      .on('keydown.dropdown.data-api touchstart.dropdown.data-api', toggle + ', [role=menu]' , Dropdown.prototype.keydown)
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-dropdown", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* =========================================================
+   * bootstrap-modal.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#modals
+   * =========================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ========================================================= */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* MODAL CLASS DEFINITION
+    * ====================== */
+  
+    var Modal = function (element, options) {
+      this.options = options
+      this.$element = $(element)
+        .delegate('[data-dismiss="modal"]', 'click.dismiss.modal', $.proxy(this.hide, this))
+      this.options.remote && this.$element.find('.modal-body').load(this.options.remote)
+    }
+  
+    Modal.prototype = {
+  
+        constructor: Modal
+  
+      , toggle: function () {
+          return this[!this.isShown ? 'show' : 'hide']()
+        }
+  
+      , show: function () {
+          var that = this
+            , e = $.Event('show')
+  
+          this.$element.trigger(e)
+  
+          if (this.isShown || false) return
+  
+          this.isShown = true
+  
+          this.escape()
+  
+          this.backdrop(function () {
+            var transition = $.support.transition && that.$element.hasClass('fade')
+  
+            if (!that.$element.parent().length) {
+              that.$element.appendTo(document.body) //don't move modals dom position
+            }
+  
+            that.$element.show('block')
+  
+            if (transition) {
+              that.$element[0].offsetWidth // force reflow
+            }
+  
+            that.$element
+              .addClass('in')
+              .attr('aria-hidden', false)
+  
+            that.enforceFocus()
+  
+            transition ?
+              that.$element.one($.support.transition.end, function () { that.$element.focus().trigger('shown') }) :
+              that.$element.focus().trigger('shown')
+  
+          })
+        }
+  
+      , hide: function (e) {
+          e && e.preventDefault()
+  
+          var that = this
+  
+          e = $.Event('hide')
+  
+          this.$element.trigger(e)
+  
+          if (!this.isShown || false) return
+  
+          this.isShown = false
+  
+          this.escape()
+  
+          $(document).off('focusin.modal')
+  
+          this.$element
+            .removeClass('in')
+            .attr('aria-hidden', true)
+  
+          $.support.transition && this.$element.hasClass('fade') ?
+            this.hideWithTransition() :
+            this.hideModal()
+        }
+  
+      , enforceFocus: function () {
+          var that = this
+          $(document).on('focusin.modal', function (e) {
+            if (that.$element[0] !== e.target && !that.$element.has(e.target).length) {
+              that.$element.focus()
+            }
+          })
+        }
+  
+      , escape: function () {
+          var that = this
+          if (this.isShown && this.options.keyboard) {
+            this.$element.on('keyup.dismiss.modal', function ( e ) {
+              e.which == 27 && that.hide()
+            })
+          } else if (!this.isShown) {
+            this.$element.off('keyup.dismiss.modal')
+          }
+        }
+  
+      , hideWithTransition: function () {
+          var that = this
+            , timeout = setTimeout(function () {
+                that.$element.off($.support.transition.end)
+                that.hideModal()
+              }, 500)
+  
+          this.$element.one($.support.transition.end, function () {
+            clearTimeout(timeout)
+            that.hideModal()
+          })
+        }
+  
+      , hideModal: function (that) {
+          this.$element
+            .hide()
+            .trigger('hidden')
+  
+          this.backdrop()
+        }
+  
+      , removeBackdrop: function () {
+          this.$backdrop.remove()
+          this.$backdrop = null
+        }
+  
+      , backdrop: function (callback) {
+          var that = this
+            , animate = this.$element.hasClass('fade') ? 'fade' : ''
+  
+          if (this.isShown && this.options.backdrop) {
+            var doAnimate = $.support.transition && animate
+  
+            this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
+              .appendTo(document.body)
+  
+            this.$backdrop.click(
+              this.options.backdrop == 'static' ?
+                $.proxy(this.$element[0].focus, this.$element[0])
+              : $.proxy(this.hide, this)
+            )
+  
+            if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
+  
+            this.$backdrop.addClass('in')
+  
+            doAnimate ?
+              this.$backdrop.one($.support.transition.end, callback) :
+              callback()
+  
+          } else if (!this.isShown && this.$backdrop) {
+            this.$backdrop.removeClass('in')
+  
+            $.support.transition && this.$element.hasClass('fade')?
+              this.$backdrop.one($.support.transition.end, $.proxy(this.removeBackdrop, this)) :
+              this.removeBackdrop()
+  
+          } else if (callback) {
+            callback()
+          }
+        }
+    }
+  
+  
+   /* MODAL PLUGIN DEFINITION
+    * ======================= */
+  
+    $.fn.modal = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('modal')
+          , options = $.extend({}, $.fn.modal.defaults, $this.data(), typeof option == 'object' && option)
+        if (!data) $this.data('modal', (data = new Modal(this, options)))
+        if (typeof option == 'string') data[option]()
+        else if (options.show) data.show()
+      })
+    }
+  
+    $.fn.modal.defaults = {
+        backdrop: true
+      , keyboard: true
+      , show: true
+    }
+  
+    $.fn.modal.Constructor = Modal
+  
+  
+   /* MODAL DATA-API
+    * ============== */
+  
+    $(document).on('click.modal.data-api', '[data-toggle="modal"]', function (e) {
+      var $this = $(this)
+        , href = $this.attr('href')
+        , $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) //strip for ie7
+        , option = $target.data('modal') ? 'toggle' : $.extend({ remote:!/#/.test(href) && href }, $target.data(), $this.data())
+  
+      e.preventDefault()
+  
+      $target
+        .modal(option)
+        .one('hide', function () {
+          $this.focus()
+        })
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-modal", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ===========================================================
+   * bootstrap-tooltip.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#tooltips
+   * Inspired by the original jQuery.tipsy by Jason Frame
+   * ===========================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ========================================================== */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* TOOLTIP PUBLIC CLASS DEFINITION
+    * =============================== */
+  
+    var Tooltip = function (element, options) {
+      this.init('tooltip', element, options)
+    }
+  
+    Tooltip.prototype = {
+  
+      constructor: Tooltip
+  
+    , init: function (type, element, options) {
+        var eventIn
+          , eventOut
+  
+        this.type = type
+        this.$element = $(element)
+        this.options = this.getOptions(options)
+        this.enabled = true
+  
+        if (this.options.trigger == 'click') {
+          this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
+        } else if (this.options.trigger != 'manual') {
+          eventIn = this.options.trigger == 'hover' ? 'mouseenter' : 'focus'
+          eventOut = this.options.trigger == 'hover' ? 'mouseleave' : 'blur'
+          this.$element.on(eventIn + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
+          this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
+        }
+  
+        this.options.selector ?
+          (this._options = $.extend({}, this.options, { trigger: 'manual', selector: '' })) :
+          this.fixTitle()
+      }
+  
+    , getOptions: function (options) {
+        options = $.extend({}, $.fn[this.type].defaults, options, this.$element.data())
+  
+        if (options.delay && typeof options.delay == 'number') {
+          options.delay = {
+            show: options.delay
+          , hide: options.delay
+          }
+        }
+  
+        return options
+      }
+  
+    , enter: function (e) {
+        var self = $((e.currentTarget || e.target))[this.type](this._options).data(this.type)
+  
+        if (!self.options.delay || !self.options.delay.show) return self.show()
+  
+        clearTimeout(this.timeout)
+        self.hoverState = 'in'
+        this.timeout = setTimeout(function() {
+          if (self.hoverState == 'in') self.show()
+        }, self.options.delay.show)
+      }
+  
+    , leave: function (e) {
+        var self = $((e.currentTarget || e.target))[this.type](this._options).data(this.type)
+  
+        if (this.timeout) clearTimeout(this.timeout)
+        if (!self.options.delay || !self.options.delay.hide) return self.hide()
+  
+        self.hoverState = 'out'
+        this.timeout = setTimeout(function() {
+          if (self.hoverState == 'out') self.hide()
+        }, self.options.delay.hide)
+      }
+  
+    , show: function () {
+        var $tip
+          , inside
+          , pos
+          , actualWidth
+          , actualHeight
+          , placement
+          , tp
+  
+        if (this.hasContent() && this.enabled) {
+          $tip = this.tip()
+          this.setContent()
+  
+          if (this.options.animation) {
+            $tip.addClass('fade')
+          }
+  
+          placement = typeof this.options.placement == 'function' ?
+            this.options.placement.call(this, $tip[0], this.$element[0]) :
+            this.options.placement
+  
+          inside = /in/.test(placement)
+  
+          $tip
+            .detach()
+            .css({ top: 0, left: 0, display: 'block' })
+            .insertAfter(this.$element)
+  
+          pos = this.getPosition(inside)
+  
+          actualWidth = $tip[0].offsetWidth
+          actualHeight = $tip[0].offsetHeight
+  
+          switch (inside ? placement.split(' ')[1] : placement) {
+            case 'bottom':
+              tp = {top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2}
+              break
+            case 'top':
+              tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2}
+              break
+            case 'left':
+              tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth}
+              break
+            case 'right':
+              tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width}
+              break
+          }
+  
+          $tip
+            .offset(tp)
+            .addClass(placement)
+            .addClass('in')
+        }
+      }
+  
+    , setContent: function () {
+        var $tip = this.tip()
+          , title = this.getTitle()
+  
+        $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
+        $tip.removeClass('fade in top bottom left right')
+      }
+  
+    , hide: function () {
+        var that = this
+          , $tip = this.tip()
+  
+        $tip.removeClass('in')
+  
+        function removeWithAnimation() {
+          var timeout = setTimeout(function () {
+            $tip.off($.support.transition.end).detach()
+          }, 500)
+  
+          $tip.one($.support.transition.end, function () {
+            clearTimeout(timeout)
+            $tip.detach()
+          })
+        }
+  
+        $.support.transition && this.$tip.hasClass('fade') ?
+          removeWithAnimation() :
+          $tip.detach()
+  
+        return this
+      }
+  
+    , fixTitle: function () {
+        var $e = this.$element
+        if ($e.attr('title') || typeof($e.attr('data-original-title')) != 'string') {
+          $e.attr('data-original-title', $e.attr('title') || '').removeAttr('title')
+        }
+      }
+  
+    , hasContent: function () {
+        return this.getTitle()
+      }
+  
+    , getPosition: function (inside) {
+        return $.extend({}, (inside ? {top: 0, left: 0} : this.$element.offset()), {
+          width: this.$element[0].offsetWidth
+        , height: this.$element[0].offsetHeight
+        })
+      }
+  
+    , getTitle: function () {
+        var title
+          , $e = this.$element
+          , o = this.options
+  
+        title = $e.attr('data-original-title')
+          || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
+  
+        return title
+      }
+  
+    , tip: function () {
+        return this.$tip = this.$tip || $(this.options.template)
+      }
+  
+    , validate: function () {
+        if (!this.$element[0].parentNode) {
+          this.hide()
+          this.$element = null
+          this.options = null
+        }
+      }
+  
+    , enable: function () {
+        this.enabled = true
+      }
+  
+    , disable: function () {
+        this.enabled = false
+      }
+  
+    , toggleEnabled: function () {
+        this.enabled = !this.enabled
+      }
+  
+    , toggle: function (e) {
+        var self = $((e.currentTarget || e.target))[this.type](this._options).data(this.type)
+        self[self.tip().hasClass('in') ? 'hide' : 'show']()
+      }
+  
+    , destroy: function () {
+        this.hide().$element.off('.' + this.type).removeData(this.type)
+      }
+  
+    }
+  
+  
+   /* TOOLTIP PLUGIN DEFINITION
+    * ========================= */
+  
+    $.fn.tooltip = function ( option ) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('tooltip')
+          , options = typeof option == 'object' && option
+        if (!data) $this.data('tooltip', (data = new Tooltip(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+  
+    $.fn.tooltip.Constructor = Tooltip
+  
+    $.fn.tooltip.defaults = {
+      animation: true
+    , placement: 'top'
+    , selector: false
+    , template: '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+    , trigger: 'hover'
+    , title: ''
+    , delay: 0
+    , html: false
+    }
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-tooltip", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ===========================================================
+   * bootstrap-popover.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#popovers
+   * ===========================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * =========================================================== */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* POPOVER PUBLIC CLASS DEFINITION
+    * =============================== */
+  
+    var Popover = function (element, options) {
+      this.init('popover', element, options)
+    }
+  
+  
+    /* NOTE: POPOVER EXTENDS BOOTSTRAP-TOOLTIP.js
+       ========================================== */
+  
+    Popover.prototype = $.extend({}, $.fn.tooltip.Constructor.prototype, {
+  
+      constructor: Popover
+  
+    , setContent: function () {
+        var $tip = this.tip()
+          , title = this.getTitle()
+          , content = this.getContent()
+  
+        $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
+        $tip.find('.popover-content > *')[this.options.html ? 'html' : 'text'](content)
+  
+        $tip.removeClass('fade top bottom left right in')
+      }
+  
+    , hasContent: function () {
+        return this.getTitle() || this.getContent()
+      }
+  
+    , getContent: function () {
+        var content
+          , $e = this.$element
+          , o = this.options
+  
+        content = $e.attr('data-content')
+          || (typeof o.content == 'function' ? o.content.call($e[0]) :  o.content)
+  
+        return content
+      }
+  
+    , tip: function () {
+        if (!this.$tip) {
+          this.$tip = $(this.options.template)
+        }
+        return this.$tip
+      }
+  
+    , destroy: function () {
+        this.hide().$element.off('.' + this.type).removeData(this.type)
+      }
+  
+    })
+  
+  
+   /* POPOVER PLUGIN DEFINITION
+    * ======================= */
+  
+    $.fn.popover = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('popover')
+          , options = typeof option == 'object' && option
+        if (!data) $this.data('popover', (data = new Popover(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+  
+    $.fn.popover.Constructor = Popover
+  
+    $.fn.popover.defaults = $.extend({} , $.fn.tooltip.defaults, {
+      placement: 'right'
+    , trigger: 'click'
+    , content: ''
+    , template: '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-popover", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* =============================================================
+   * bootstrap-scrollspy.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#scrollspy
+   * =============================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ============================================================== */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* SCROLLSPY CLASS DEFINITION
+    * ========================== */
+  
+    function ScrollSpy(element, options) {
+      var process = $.proxy(this.process, this)
+        , $element = $(element).is('body') ? $(window) : $(element)
+        , href
+      this.options = $.extend({}, $.fn.scrollspy.defaults, options)
+      this.$scrollElement = $element.on('scroll.scroll-spy.data-api', process)
+      this.selector = (this.options.target
+        || ((href = $(element).attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) //strip for ie7
+        || '') + ' .nav li > a'
+      this.$body = $('body')
+      this.refresh()
+      this.process()
+    }
+  
+    ScrollSpy.prototype = {
+  
+        constructor: ScrollSpy
+  
+      , refresh: function () {
+          var self = this
+            , $targets
+  
+          this.offsets = []
+          this.targets = []
+  
+          $targets = this.$body
+            .find(this.selector)
+            .map(function () {
+              var $el = $(this)
+                , href = $el.data('target') || $el.attr('href')
+                , $href = /^#\w/.test(href) && $(href)
+              return ( $href
+                && $href.length
+                && [ $href.position().top, href ] ) || null
+            })
+            .sort(function (a, b) { return a[0] - b[0] })
+            .each(function () {
+              self.offsets.push(this[0])
+              self.targets.push(this[1])
+            })
+        }
+  
+      , process: function () {
+          var scrollTop = this.$scrollElement.scrollTop() + this.options.offset
+            , scrollHeight = this.$scrollElement[0].scrollHeight || this.$body[0].scrollHeight
+            , maxScroll = scrollHeight - this.$scrollElement.height()
+            , offsets = this.offsets
+            , targets = this.targets
+            , activeTarget = this.activeTarget
+            , i
+  
+          if (scrollTop >= maxScroll) {
+            return activeTarget != (i = targets[targets.length-1])
+              && this.activate ( i )
+          }
+  
+          for (i = offsets.length; i--;) {
+            activeTarget != targets[i]
+              && scrollTop >= offsets[i]
+              && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+              && this.activate( targets[i] )
+          }
+        }
+  
+      , activate: function (target) {
+          var active
+            , selector
+  
+          this.activeTarget = target
+  
+          $(this.selector)
+            .parent('.active')
+            .removeClass('active')
+  
+          selector = this.selector
+            + '[data-target="' + target + '"],'
+            + this.selector + '[href="' + target + '"]'
+  
+          active = $(selector)
+            .parent('li')
+            .addClass('active')
+  
+          if (active.parent('.dropdown-menu').length)  {
+            active = active.closest('li.dropdown').addClass('active')
+          }
+  
+          active.trigger('activate')
+        }
+  
+    }
+  
+  
+   /* SCROLLSPY PLUGIN DEFINITION
+    * =========================== */
+  
+    $.fn.scrollspy = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('scrollspy')
+          , options = typeof option == 'object' && option
+        if (!data) $this.data('scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+  
+    $.fn.scrollspy.Constructor = ScrollSpy
+  
+    $.fn.scrollspy.defaults = {
+      offset: 10
+    }
+  
+  
+   /* SCROLLSPY DATA-API
+    * ================== */
+  
+    $(window).on('load', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        $spy.scrollspy($spy.data())
+      })
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-scrollspy", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* ========================================================
+   * bootstrap-tab.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#tabs
+   * ========================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ======================================================== */
+  
+  
+  !function ($) {
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* TAB CLASS DEFINITION
+    * ==================== */
+  
+    var Tab = function (element) {
+      this.element = $(element)
+    }
+  
+    Tab.prototype = {
+  
+      constructor: Tab
+  
+    , show: function () {
+        var $this = this.element
+          , $ul = $this.closest('ul:not(.dropdown-menu)')
+          , selector = $this.attr('data-target')
+          , previous
+          , $target
+          , e
+  
+        if (!selector) {
+          selector = $this.attr('href')
+          selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') //strip for ie7
+        }
+  
+        if ( $this.parent('li').hasClass('active') ) return
+  
+        previous = $ul.find('.active:last a')[0]
+  
+        e = $.Event('show', {
+          relatedTarget: previous
+        })
+  
+        $this.trigger(e)
+  
+        if (false) return
+  
+        $target = $(selector)
+  
+        this.activate($this.parent('li'), $ul)
+        this.activate($target, $target.parent(), function () {
+          $this.trigger({
+            type: 'shown'
+          , relatedTarget: previous
+          })
+        })
+      }
+  
+    , activate: function ( element, container, callback) {
+        var $active = container.find('> .active')
+          , transition = callback
+              && $.support.transition
+              && $active.hasClass('fade')
+  
+        function next() {
+          $active
+            .removeClass('active')
+            .find('> .dropdown-menu > .active')
+            .removeClass('active')
+  
+          element.addClass('active')
+  
+          if (transition) {
+            element[0].offsetWidth // reflow for transition
+            element.addClass('in')
+          } else {
+            element.removeClass('fade')
+          }
+  
+          if ( element.parent('.dropdown-menu') ) {
+            element.closest('li.dropdown').addClass('active')
+          }
+  
+          callback && callback()
+        }
+  
+        transition ?
+          $active.one($.support.transition.end, next) :
+          next()
+  
+        $active.removeClass('in')
+      }
+    }
+  
+  
+   /* TAB PLUGIN DEFINITION
+    * ===================== */
+  
+    $.fn.tab = function ( option ) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('tab')
+        if (!data) $this.data('tab', (data = new Tab(this)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+  
+    $.fn.tab.Constructor = Tab
+  
+  
+   /* TAB DATA-API
+    * ============ */
+  
+    $(document).on('click.tab.data-api', '[data-toggle="tab"], [data-toggle="pill"]', function (e) {
+      e.preventDefault()
+      $(this).tab('show')
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-tab", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /* =============================================================
+   * bootstrap-typeahead.js v2.2.1
+   * http://twitter.github.com/bootstrap/javascript.html#typeahead
+   * =============================================================
+   * Copyright 2012 Twitter, Inc.
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   * ============================================================ */
+  
+  
+  !function($){
+  
+    "use strict"; // jshint ;_;
+  
+  
+   /* TYPEAHEAD PUBLIC CLASS DEFINITION
+    * ================================= */
+  
+    var Typeahead = function (element, options) {
+      this.$element = $(element)
+      this.options = $.extend({}, $.fn.typeahead.defaults, options)
+      this.matcher = this.options.matcher || this.matcher
+      this.sorter = this.options.sorter || this.sorter
+      this.highlighter = this.options.highlighter || this.highlighter
+      this.updater = this.options.updater || this.updater
+      this.$menu = $(this.options.menu).appendTo('body')
+      this.source = this.options.source
+      this.shown = false
+      this.listen()
+    }
+  
+    Typeahead.prototype = {
+  
+      constructor: Typeahead
+  
+    , select: function () {
+        var val = this.$menu.find('.active').attr('data-value')
+        this.$element
+          .val(this.updater(val))
+          .change()
+        return this.hide()
+      }
+  
+    , updater: function (item) {
+        return item
+      }
+  
+    , show: function () {
+        var pos = $.extend({}, this.$element.offset(), {
+          height: this.$element[0].offsetHeight
+        })
+  
+        this.$menu.css({
+          top: pos.top + pos.height
+        , left: pos.left
+        })
+  
+        this.$menu.show('block')
+        this.shown = true
+        return this
+      }
+  
+    , hide: function () {
+        this.$menu.hide()
+        this.shown = false
+        return this
+      }
+  
+    , lookup: function (event) {
+        var items
+  
+        this.query = this.$element.val()
+  
+        if (!this.query || this.query.length < this.options.minLength) {
+          return this.shown ? this.hide() : this
+        }
+  
+        items = (typeof this.source == "function") ? this.source(this.query, $.proxy(this.process, this)) : this.source
+  
+        return items ? this.process(items) : this
+      }
+  
+    , process: function (items) {
+        var that = this
+  
+        items = $.grep(items, function (item) {
+          return that.matcher(item)
+        })
+  
+        items = this.sorter(items)
+  
+        if (!items.length) {
+          return this.shown ? this.hide() : this
+        }
+  
+        return this.render(items.slice(0, this.options.items)).show()
+      }
+  
+    , matcher: function (item) {
+        return ~item.toLowerCase().indexOf(this.query.toLowerCase())
+      }
+  
+    , sorter: function (items) {
+        var beginswith = []
+          , caseSensitive = []
+          , caseInsensitive = []
+          , item
+  
+        while (item = items.shift()) {
+          if (!item.toLowerCase().indexOf(this.query.toLowerCase())) beginswith.push(item)
+          else if (~item.indexOf(this.query)) caseSensitive.push(item)
+          else caseInsensitive.push(item)
+        }
+  
+        return beginswith.concat(caseSensitive, caseInsensitive)
+      }
+  
+    , highlighter: function (item) {
+        var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&')
+        return item.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+          return '<strong>' + match + '</strong>'
+        })
+      }
+  
+    , render: function (items) {
+        var that = this
+  
+        items = $(items).map(function (item, i) {
+          i = $(that.options.item).attr('data-value', item)
+          i.find('a').html(that.highlighter(item))
+          return i[0]
+        })
+  
+        $(items).first().addClass('active')
+        this.$menu.empty().append(items)
+        return this
+      }
+  
+    , next: function (event) {
+        var active = this.$menu.find('.active').removeClass('active')
+          , next = active.next()
+  
+        if (!next.length) {
+          next = $(this.$menu.find('li')[0])
+        }
+  
+        next.addClass('active')
+      }
+  
+    , prev: function (event) {
+        var active = this.$menu.find('.active').removeClass('active')
+          , prev = active.prev()
+  
+        if (!prev.length) {
+          prev = this.$menu.find('li').last()
+        }
+  
+        prev.addClass('active')
+      }
+  
+    , listen: function () {
+        this.$element
+          .on('blur',     $.proxy(this.blur, this))
+          .on('keypress', $.proxy(this.keypress, this))
+          .on('keyup',    $.proxy(this.keyup, this))
+  
+        if (this.eventSupported('keydown')) {
+          this.$element.on('keydown', $.proxy(this.keydown, this))
+        }
+  
+        this.$menu
+          .on('click', $.proxy(this.click, this))
+          .on('mouseenter', 'li', $.proxy(this.mouseenter, this))
+      }
+  
+    , eventSupported: function(eventName) {
+        var isSupported = eventName in this.$element
+        if (!isSupported) {
+          this.$element.setAttribute(eventName, 'return;')
+          isSupported = typeof this.$element[eventName] === 'function'
+        }
+        return isSupported
+      }
+  
+    , move: function (e) {
+        if (!this.shown) return
+  
+        switch(e.keyCode) {
+          case 9: // tab
+          case 13: // enter
+          case 27: // escape
+            e.preventDefault()
+            break
+  
+          case 38: // up arrow
+            e.preventDefault()
+            this.prev()
+            break
+  
+          case 40: // down arrow
+            e.preventDefault()
+            this.next()
+            break
+        }
+  
+        e.stopPropagation()
+      }
+  
+    , keydown: function (e) {
+        this.suppressKeyPressRepeat = !~$.inArray(e.keyCode, [40,38,9,13,27])
+        this.move(e)
+      }
+  
+    , keypress: function (e) {
+        if (this.suppressKeyPressRepeat) return
+        this.move(e)
+      }
+  
+    , keyup: function (e) {
+        switch(e.keyCode) {
+          case 40: // down arrow
+          case 38: // up arrow
+          case 16: // shift
+          case 17: // ctrl
+          case 18: // alt
+            break
+  
+          case 9: // tab
+          case 13: // enter
+            if (!this.shown) return
+            this.select()
+            break
+  
+          case 27: // escape
+            if (!this.shown) return
+            this.hide()
+            break
+  
+          default:
+            this.lookup()
+        }
+  
+        e.stopPropagation()
+        e.preventDefault()
+    }
+  
+    , blur: function (e) {
+        var that = this
+        setTimeout(function () { that.hide() }, 150)
+      }
+  
+    , click: function (e) {
+        e.stopPropagation()
+        e.preventDefault()
+        this.select()
+      }
+  
+    , mouseenter: function (e) {
+        this.$menu.find('.active').removeClass('active')
+        $((e.currentTarget || e.target)).addClass('active')
+      }
+  
+    }
+  
+  
+    /* TYPEAHEAD PLUGIN DEFINITION
+     * =========================== */
+  
+    $.fn.typeahead = function (option) {
+      return this.each(function () {
+        var $this = $(this)
+          , data = $this.data('typeahead')
+          , options = typeof option == 'object' && option
+        if (!data) $this.data('typeahead', (data = new Typeahead(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+  
+    $.fn.typeahead.defaults = {
+      source: []
+    , items: 8
+    , menu: '<ul class="typeahead dropdown-menu"></ul>'
+    , item: '<li><a href="#"></a></li>'
+    , minLength: 1
+    }
+  
+    $.fn.typeahead.Constructor = Typeahead
+  
+  
+   /*   TYPEAHEAD DATA-API
+    * ================== */
+  
+    $('[data-provide="typeahead"]').on('focus.typeahead.data-api', function (e) {
+      var $this = $(this)
+      if ($this.data('typeahead')) return
+      e.preventDefault()
+      $this.typeahead($this.data())
+    })
+  }(require('ender-bootstrap-base-faker'))
+
+  provide("ender-bootstrap-typeahead", module.exports);
 
   $.ender(module.exports);
 
@@ -4856,1141 +6739,612 @@
   var module = { exports: {} }, exports = module.exports;
 
   /*!
-   * commander
-   * Copyright(c) 2011 TJ Holowaychuk <tj@vision-media.ca>
-   * MIT Licensed
-   */
+    * Bowser - a browser detector
+    * https://github.com/ded/bowser
+    * MIT License | (c) Dustin Diaz 2011
+    */
+  !function (name, definition) {
+    if (typeof define == 'function') define(definition)
+    else if (typeof module != 'undefined' && module.exports) module.exports['browser'] = definition()
+    else this[name] = definition()
+  }('bowser', function () {
+    /**
+      * navigator.userAgent =>
+      * Chrome:  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_7) AppleWebKit/534.24 (KHTML, like Gecko) Chrome/11.0.696.57 Safari/534.24"
+      * Opera:   "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.7; U; en) Presto/2.7.62 Version/11.01"
+      * Safari:  "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; en-us) AppleWebKit/533.21.1 (KHTML, like Gecko) Version/5.0.5 Safari/533.21.1"
+      * IE:      "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C)"
+      * Firefox: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0) Gecko/20100101 Firefox/4.0"
+      * iPhone:  "Mozilla/5.0 (iPhone Simulator; U; CPU iPhone OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5"
+      * iPad:    "Mozilla/5.0 (iPad; U; CPU OS 4_3_2 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8H7 Safari/6533.18.5",
+      * Android: "Mozilla/5.0 (Linux; U; Android 2.3.4; en-us; T-Mobile G2 Build/GRJ22) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"
+      * Touchpad: "Mozilla/5.0 (hp-tabled;Linux;hpwOS/3.0.5; U; en-US)) AppleWebKit/534.6 (KHTML, like Gecko) wOSBrowser/234.83 Safari/534.6 TouchPad/1.0"
+      */
   
-  /**
-   * Module dependencies.
-   */
+    var ua = navigator.userAgent
+      , t = true
+      , ie = /msie/i.test(ua)
+      , chrome = /chrome/i.test(ua)
+      , safari = /safari/i.test(ua) && !chrome
+      , iphone = /iphone/i.test(ua)
+      , ipad = /ipad/i.test(ua)
+      , touchpad = /touchpad/i.test(ua)
+      , android = /android/i.test(ua)
+      , opera = /opera/i.test(ua)
+      , firefox = /firefox/i.test(ua)
+      , gecko = /gecko\//i.test(ua)
+      , seamonkey = /seamonkey\//i.test(ua)
+      , webkitVersion = /version\/(\d+(\.\d+)?)/i
+      , o
   
-  var EventEmitter = require('events').EventEmitter
-    , spawn = require('child_process').spawn
-    , keypress = require('keypress')
-    , fs = require('fs')
-    , exists = fs.existsSync
-    , path = require('path')
-    , tty = require('tty')
-    , dirname = path.dirname
-    , basename = path.basename;
+    function detect() {
   
-  /**
-   * Expose the root command.
-   */
-  
-  exports = module.exports = new Command;
-  
-  /**
-   * Expose `Command`.
-   */
-  
-  exports.Command = Command;
-  
-  /**
-   * Expose `Option`.
-   */
-  
-  exports.Option = Option;
-  
-  /**
-   * Initialize a new `Option` with the given `flags` and `description`.
-   *
-   * @param {String} flags
-   * @param {String} description
-   * @api public
-   */
-  
-  function Option(flags, description) {
-    this.flags = flags;
-    this.required = ~flags.indexOf('<');
-    this.optional = ~flags.indexOf('[');
-    this.bool = !~flags.indexOf('-no-');
-    flags = flags.split(/[ ,|]+/);
-    if (flags.length > 1 && !/^[[<]/.test(flags[1])) this.short = flags.shift();
-    this.long = flags.shift();
-    this.description = description || '';
-  }
-  
-  /**
-   * Return option name.
-   *
-   * @return {String}
-   * @api private
-   */
-  
-  Option.prototype.name = function(){
-    return this.long
-      .replace('--', '')
-      .replace('no-', '');
-  };
-  
-  /**
-   * Check if `arg` matches the short or long flag.
-   *
-   * @param {String} arg
-   * @return {Boolean}
-   * @api private
-   */
-  
-  Option.prototype.is = function(arg){
-    return arg == this.short
-      || arg == this.long;
-  };
-  
-  /**
-   * Initialize a new `Command`.
-   *
-   * @param {String} name
-   * @api public
-   */
-  
-  function Command(name) {
-    this.commands = [];
-    this.options = [];
-    this._args = [];
-    this._name = name;
-  }
-  
-  /**
-   * Inherit from `EventEmitter.prototype`.
-   */
-  
-  Command.prototype.__proto__ = EventEmitter.prototype;
-  
-  /**
-   * Add command `name`.
-   *
-   * The `.action()` callback is invoked when the
-   * command `name` is specified via __ARGV__,
-   * and the remaining arguments are applied to the
-   * function for access.
-   *
-   * When the `name` is "*" an un-matched command
-   * will be passed as the first arg, followed by
-   * the rest of __ARGV__ remaining.
-   *
-   * Examples:
-   *
-   *      program
-   *        .version('0.0.1')
-   *        .option('-C, --chdir <path>', 'change the working directory')
-   *        .option('-c, --config <path>', 'set config path. defaults to ./deploy.conf')
-   *        .option('-T, --no-tests', 'ignore test hook')
-   *     
-   *      program
-   *        .command('setup')
-   *        .description('run remote setup commands')
-   *        .action(function(){
-   *          console.log('setup');
-   *        });
-   *     
-   *      program
-   *        .command('exec <cmd>')
-   *        .description('run the given remote command')
-   *        .action(function(cmd){
-   *          console.log('exec "%s"', cmd);
-   *        });
-   *     
-   *      program
-   *        .command('*')
-   *        .description('deploy the given env')
-   *        .action(function(env){
-   *          console.log('deploying "%s"', env);
-   *        });
-   *     
-   *      program.parse(process.argv);
-    *
-   * @param {String} name
-   * @param {String} [desc]
-   * @return {Command} the new command
-   * @api public
-   */
-  
-  Command.prototype.command = function(name, desc){
-    var args = name.split(/ +/);
-    var cmd = new Command(args.shift());
-    if (desc) cmd.description(desc);
-    if (desc) this.executables = true;
-    this.commands.push(cmd);
-    cmd.parseExpectedArgs(args);
-    cmd.parent = this;
-    if (desc) return this;
-    return cmd;
-  };
-  
-  /**
-   * Add an implicit `help [cmd]` subcommand
-   * which invokes `--help` for the given command.
-   *
-   * @api private
-   */
-  
-  Command.prototype.addImplicitHelpCommand = function() {
-    this.command('help [cmd]', 'display help for [cmd]');
-  };
-  
-  /**
-   * Parse expected `args`.
-   *
-   * For example `["[type]"]` becomes `[{ required: false, name: 'type' }]`.
-   *
-   * @param {Array} args
-   * @return {Command} for chaining
-   * @api public
-   */
-  
-  Command.prototype.parseExpectedArgs = function(args){
-    if (!args.length) return;
-    var self = this;
-    args.forEach(function(arg){
-      switch (arg[0]) {
-        case '<':
-          self._args.push({ required: true, name: arg.slice(1, -1) });
-          break;
-        case '[':
-          self._args.push({ required: false, name: arg.slice(1, -1) });
-          break;
+      if (ie) return {
+          msie: t
+        , version: ua.match(/msie (\d+(\.\d+)?);/i)[1]
       }
-    });
-    return this;
-  };
-  
-  /**
-   * Register callback `fn` for the command.
-   *
-   * Examples:
-   *
-   *      program
-   *        .command('help')
-   *        .description('display verbose help')
-   *        .action(function(){
-   *           // output help here
-   *        });
-   *
-   * @param {Function} fn
-   * @return {Command} for chaining
-   * @api public
-   */
-  
-  Command.prototype.action = function(fn){
-    var self = this;
-    this.parent.on(this._name, function(args, unknown){    
-      // Parse any so-far unknown options
-      unknown = unknown || [];
-      var parsed = self.parseOptions(unknown);
-      
-      // Output help if necessary
-      outputHelpIfNecessary(self, parsed.unknown);
-      
-      // If there are still any unknown options, then we simply 
-      // die, unless someone asked for help, in which case we give it
-      // to them, and then we die.
-      if (parsed.unknown.length > 0) {      
-        self.unknownOption(parsed.unknown[0]);
+      if (chrome) return {
+          webkit: t
+        , chrome: t
+        , version: ua.match(/chrome\/(\d+(\.\d+)?)/i)[1]
       }
-      
-      // Leftover arguments need to be pushed back. Fixes issue #56
-      if (parsed.args.length) args = parsed.args.concat(args);
-      
-      self._args.forEach(function(arg, i){
-        if (arg.required && null == args[i]) {
-          self.missingArgument(arg.name);
+      if (touchpad) return {
+          webkit: t
+        , touchpad: t
+        , version : ua.match(/touchpad\/(\d+(\.\d+)?)/i)[1]
+      }
+      if (iphone || ipad) {
+        o = {
+            webkit: t
+          , mobile: t
+          , ios: t
+          , iphone: iphone
+          , ipad: ipad
         }
-      });
-      
-      // Always append ourselves to the end of the arguments,
-      // to make sure we match the number of arguments the user
-      // expects
-      if (self._args.length) {
-        args[self._args.length] = self;
-      } else {
-        args.push(self);
-      }
-      
-      fn.apply(this, args);
-    });
-    return this;
-  };
-  
-  /**
-   * Define option with `flags`, `description` and optional
-   * coercion `fn`. 
-   *
-   * The `flags` string should contain both the short and long flags,
-   * separated by comma, a pipe or space. The following are all valid
-   * all will output this way when `--help` is used.
-   *
-   *    "-p, --pepper"
-   *    "-p|--pepper"
-   *    "-p --pepper"
-   *
-   * Examples:
-   *
-   *     // simple boolean defaulting to false
-   *     program.option('-p, --pepper', 'add pepper');
-   *
-   *     --pepper
-   *     program.pepper
-   *     // => Boolean
-   *
-   *     // simple boolean defaulting to false
-   *     program.option('-C, --no-cheese', 'remove cheese');
-   *
-   *     program.cheese
-   *     // => true
-   *
-   *     --no-cheese
-   *     program.cheese
-   *     // => true
-   *
-   *     // required argument
-   *     program.option('-C, --chdir <path>', 'change the working directory');
-   *
-   *     --chdir /tmp
-   *     program.chdir
-   *     // => "/tmp"
-   *
-   *     // optional argument
-   *     program.option('-c, --cheese [type]', 'add cheese [marble]');
-   *
-   * @param {String} flags
-   * @param {String} description
-   * @param {Function|Mixed} fn or default
-   * @param {Mixed} defaultValue
-   * @return {Command} for chaining
-   * @api public
-   */
-  
-  Command.prototype.option = function(flags, description, fn, defaultValue){
-    var self = this
-      , option = new Option(flags, description)
-      , oname = option.name()
-      , name = camelcase(oname);
-  
-    // default as 3rd arg
-    if ('function' != typeof fn) defaultValue = fn, fn = null;
-  
-    // preassign default value only for --no-*, [optional], or <required>
-    if (false == option.bool || option.optional || option.required) {
-      // when --no-* we make sure default is true
-      if (false == option.bool) defaultValue = true;
-      // preassign only if we have a default
-      if (undefined !== defaultValue) self[name] = defaultValue;
-    }
-  
-    // register the option
-    this.options.push(option);
-  
-    // when it's passed assign the value
-    // and conditionally invoke the callback
-    this.on(oname, function(val){
-      // coercion
-      if (null != val && fn) val = fn(val);
-  
-      // unassigned or bool
-      if ('boolean' == typeof self[name] || 'undefined' == typeof self[name]) {
-        // if no value, bool true, and we have a default, then use it!
-        if (null == val) {
-          self[name] = option.bool
-            ? defaultValue || true
-            : false;
-        } else {
-          self[name] = val;
+        // WTF: version is not part of user agent in web apps
+        if (webkitVersion.test(ua)) {
+          o.version = ua.match(webkitVersion)[1]
         }
-      } else if (null !== val) {
-        // reassign
-        self[name] = val;
+        return o
       }
-    });
-  
-    return this;
-  };
-  
-  /**
-   * Parse `argv`, settings options and invoking commands when defined.
-   *
-   * @param {Array} argv
-   * @return {Command} for chaining
-   * @api public
-   */
-  
-  Command.prototype.parse = function(argv){
-    // implicit help
-    if (this.executables) this.addImplicitHelpCommand();
-  
-    // store raw args
-    this.rawArgs = argv;
-  
-    // guess name
-    this._name = this._name || basename(argv[1]);
-  
-    // process argv
-    var parsed = this.parseOptions(this.normalize(argv.slice(2)));
-    var args = this.args = parsed.args;
-   
-    // executable sub-commands, skip .parseArgs()
-    if (this.executables) return this.executeSubCommand(argv, args, parsed.unknown);
-  
-    return this.parseArgs(this.args, parsed.unknown);
-  };
-  
-  /**
-   * Execute a sub-command executable.
-   *
-   * @param {Array} argv
-   * @param {Array} args
-   * @param {Array} unknown
-   * @api private
-   */
-  
-  Command.prototype.executeSubCommand = function(argv, args, unknown) {
-    args = args.concat(unknown);
-  
-    if (!args.length) this.help();
-    if ('help' == args[0] && 1 == args.length) this.help();
-  
-    // <cmd> --help
-    if ('help' == args[0]) {
-      args[0] = args[1];
-      args[1] = '--help';
-    }
-  
-    // executable
-    var dir = dirname(argv[1]);
-    var bin = basename(argv[1]) + '-' + args[0];
-  
-    // check for ./<bin> first
-    var local = path.join(dir, bin);
-    if (exists(local)) bin = local;
-  
-    // run it
-    args = args.slice(1);
-    var proc = spawn(bin, args, { stdio: 'inherit', customFds: [0, 1, 2] });
-    proc.on('exit', function(code){
-      if (code == 127) {
-        console.error('\n  %s(1) does not exist\n', bin);
+      if (android) return {
+          webkit: t
+        , android: t
+        , mobile: t
+        , version: ua.match(webkitVersion)[1]
       }
-    });
-  };
-  
-  /**
-   * Normalize `args`, splitting joined short flags. For example
-   * the arg "-abc" is equivalent to "-a -b -c".
-   * This also normalizes equal sign and splits "--abc=def" into "--abc def".
-   *
-   * @param {Array} args
-   * @return {Array}
-   * @api private
-   */
-  
-  Command.prototype.normalize = function(args){
-    var ret = []
-      , arg
-      , index;
-  
-    for (var i = 0, len = args.length; i < len; ++i) {
-      arg = args[i];
-      if (arg.length > 1 && '-' == arg[0] && '-' != arg[1]) {
-        arg.slice(1).split('').forEach(function(c){
-          ret.push('-' + c);
-        });
-      } else if (/^--/.test(arg) && ~(index = arg.indexOf('='))) {
-        ret.push(arg.slice(0, index), arg.slice(index + 1));
-      } else {
-        ret.push(arg);
+      if (safari) return {
+          webkit: t
+        , safari: t
+        , version: ua.match(webkitVersion)[1]
       }
-    }
-  
-    return ret;
-  };
-  
-  /**
-   * Parse command `args`.
-   *
-   * When listener(s) are available those
-   * callbacks are invoked, otherwise the "*"
-   * event is emitted and those actions are invoked.
-   *
-   * @param {Array} args
-   * @return {Command} for chaining
-   * @api private
-   */
-  
-  Command.prototype.parseArgs = function(args, unknown){
-    var cmds = this.commands
-      , len = cmds.length
-      , name;
-  
-    if (args.length) {
-      name = args[0];
-      if (this.listeners(name).length) {
-        this.emit(args.shift(), args, unknown);
-      } else {
-        this.emit('*', args);
+      if (opera) return {
+          opera: t
+        , version: ua.match(webkitVersion)[1]
       }
-    } else {
-      outputHelpIfNecessary(this, unknown);
-      
-      // If there were no args and we have unknown options,
-      // then they are extraneous and we need to error.
-      if (unknown.length > 0) {      
-        this.unknownOption(unknown[0]);
-      }
-    }
-  
-    return this;
-  };
-  
-  /**
-   * Return an option matching `arg` if any.
-   *
-   * @param {String} arg
-   * @return {Option}
-   * @api private
-   */
-  
-  Command.prototype.optionFor = function(arg){
-    for (var i = 0, len = this.options.length; i < len; ++i) {
-      if (this.options[i].is(arg)) {
-        return this.options[i];
-      }
-    }
-  };
-  
-  /**
-   * Parse options from `argv` returning `argv`
-   * void of these options.
-   *
-   * @param {Array} argv
-   * @return {Array}
-   * @api public
-   */
-  
-  Command.prototype.parseOptions = function(argv){
-    var args = []
-      , len = argv.length
-      , literal
-      , option
-      , arg;
-  
-    var unknownOptions = [];
-  
-    // parse options
-    for (var i = 0; i < len; ++i) {
-      arg = argv[i];
-  
-      // literal args after --
-      if ('--' == arg) {
-        literal = true;
-        continue;
-      }
-  
-      if (literal) {
-        args.push(arg);
-        continue;
-      }
-  
-      // find matching Option
-      option = this.optionFor(arg);
-  
-      // option is defined
-      if (option) {
-        // requires arg
-        if (option.required) {
-          arg = argv[++i];
-          if (null == arg) return this.optionMissingArgument(option);
-          if ('-' == arg[0]) return this.optionMissingArgument(option, arg);
-          this.emit(option.name(), arg);
-        // optional arg
-        } else if (option.optional) {
-          arg = argv[i+1];
-          if (null == arg || '-' == arg[0]) {
-            arg = null;
-          } else {
-            ++i;
-          }
-          this.emit(option.name(), arg);
-        // bool
-        } else {
-          this.emit(option.name());
+      if (gecko) {
+        o = {
+            gecko: t
+          , mozilla: t
+          , version: ua.match(/firefox\/(\d+(\.\d+)?)/i)[1]
         }
-        continue;
+        if (firefox) o.firefox = t
+        return o
       }
-      
-      // looks like an option
-      if (arg.length > 1 && '-' == arg[0]) {
-        unknownOptions.push(arg);
-        
-        // If the next argument looks like it might be
-        // an argument for this option, we pass it on.
-        // If it isn't, then it'll simply be ignored
-        if (argv[i+1] && '-' != argv[i+1][0]) {
-          unknownOptions.push(argv[++i]);
-        }
-        continue;
-      }
-      
-      // arg
-      args.push(arg);
-    }
-    
-    return { args: args, unknown: unknownOptions };
-  };
-  
-  /**
-   * Argument `name` is missing.
-   *
-   * @param {String} name
-   * @api private
-   */
-  
-  Command.prototype.missingArgument = function(name){
-    console.error();
-    console.error("  error: missing required argument `%s'", name);
-    console.error();
-    process.exit(1);
-  };
-  
-  /**
-   * `Option` is missing an argument, but received `flag` or nothing.
-   *
-   * @param {String} option
-   * @param {String} flag
-   * @api private
-   */
-  
-  Command.prototype.optionMissingArgument = function(option, flag){
-    console.error();
-    if (flag) {
-      console.error("  error: option `%s' argument missing, got `%s'", option.flags, flag);
-    } else {
-      console.error("  error: option `%s' argument missing", option.flags);
-    }
-    console.error();
-    process.exit(1);
-  };
-  
-  /**
-   * Unknown option `flag`.
-   *
-   * @param {String} flag
-   * @api private
-   */
-  
-  Command.prototype.unknownOption = function(flag){
-    console.error();
-    console.error("  error: unknown option `%s'", flag);
-    console.error();
-    process.exit(1);
-  };
-  
-  
-  /**
-   * Set the program version to `str`.
-   *
-   * This method auto-registers the "-V, --version" flag
-   * which will print the version number when passed.
-   *
-   * @param {String} str
-   * @param {String} flags
-   * @return {Command} for chaining
-   * @api public
-   */
-  
-  Command.prototype.version = function(str, flags){
-    if (0 == arguments.length) return this._version;
-    this._version = str;
-    flags = flags || '-V, --version';
-    this.option(flags, 'output the version number');
-    this.on('version', function(){
-      console.log(str);
-      process.exit(0);
-    });
-    return this;
-  };
-  
-  /**
-   * Set the description `str`.
-   *
-   * @param {String} str
-   * @return {String|Command}
-   * @api public
-   */
-  
-  Command.prototype.description = function(str){
-    if (0 == arguments.length) return this._description;
-    this._description = str;
-    return this;
-  };
-  
-  /**
-   * Set / get the command usage `str`.
-   *
-   * @param {String} str
-   * @return {String|Command}
-   * @api public
-   */
-  
-  Command.prototype.usage = function(str){
-    var args = this._args.map(function(arg){
-      return arg.required
-        ? '<' + arg.name + '>'
-        : '[' + arg.name + ']';
-    });
-  
-    var usage = '[options'
-      + (this.commands.length ? '] [command' : '')
-      + ']'
-      + (this._args.length ? ' ' + args : '');
-  
-    if (0 == arguments.length) return this._usage || usage;
-    this._usage = str;
-  
-    return this;
-  };
-  
-  /**
-   * Return the largest option length.
-   *
-   * @return {Number}
-   * @api private
-   */
-  
-  Command.prototype.largestOptionLength = function(){
-    return this.options.reduce(function(max, option){
-      return Math.max(max, option.flags.length);
-    }, 0);
-  };
-  
-  /**
-   * Return help for options.
-   *
-   * @return {String}
-   * @api private
-   */
-  
-  Command.prototype.optionHelp = function(){
-    var width = this.largestOptionLength();
-    
-    // Prepend the help information
-    return [pad('-h, --help', width) + '  ' + 'output usage information']
-      .concat(this.options.map(function(option){
-        return pad(option.flags, width)
-          + '  ' + option.description;
-        }))
-      .join('\n');
-  };
-  
-  /**
-   * Return command help documentation.
-   *
-   * @return {String}
-   * @api private
-   */
-  
-  Command.prototype.commandHelp = function(){
-    if (!this.commands.length) return '';
-    return [
-        ''
-      , '  Commands:'
-      , ''
-      , this.commands.map(function(cmd){
-        var args = cmd._args.map(function(arg){
-          return arg.required
-            ? '<' + arg.name + '>'
-            : '[' + arg.name + ']';
-        }).join(' ');
-  
-        return pad(cmd._name
-          + (cmd.options.length 
-            ? ' [options]'
-            : '') + ' ' + args, 22)
-          + (cmd.description()
-            ? ' ' + cmd.description()
-            : '');
-      }).join('\n').replace(/^/gm, '    ')
-      , ''
-    ].join('\n');
-  };
-  
-  /**
-   * Return program help documentation.
-   *
-   * @return {String}
-   * @api private
-   */
-  
-  Command.prototype.helpInformation = function(){
-    return [
-        ''
-      , '  Usage: ' + this._name + ' ' + this.usage()
-      , '' + this.commandHelp()
-      , '  Options:'
-      , ''
-      , '' + this.optionHelp().replace(/^/gm, '    ')
-      , ''
-      , ''
-    ].join('\n');
-  };
-  
-  /**
-   * Prompt for a `Number`.
-   *
-   * @param {String} str
-   * @param {Function} fn
-   * @api private
-   */
-  
-  Command.prototype.promptForNumber = function(str, fn){
-    var self = this;
-    this.promptSingleLine(str, function parseNumber(val){
-      val = Number(val);
-      if (isNaN(val)) return self.promptSingleLine(str + '(must be a number) ', parseNumber);
-      fn(val);
-    });
-  };
-  
-  /**
-   * Prompt for a `Date`.
-   *
-   * @param {String} str
-   * @param {Function} fn
-   * @api private
-   */
-  
-  Command.prototype.promptForDate = function(str, fn){
-    var self = this;
-    this.promptSingleLine(str, function parseDate(val){
-      val = new Date(val);
-      if (isNaN(val.getTime())) return self.promptSingleLine(str + '(must be a date) ', parseDate);
-      fn(val);
-    });
-  };
-  
-  /**
-   * Single-line prompt.
-   *
-   * @param {String} str
-   * @param {Function} fn
-   * @api private
-   */
-  
-  Command.prototype.promptSingleLine = function(str, fn){
-    if ('function' == typeof arguments[2]) {
-      return this['promptFor' + (fn.name || fn)](str, arguments[2]);
-    }
-  
-    process.stdout.write(str);
-    process.stdin.setEncoding('utf8');
-    process.stdin.once('data', function(val){
-      fn(val.trim());
-    }).resume();
-  };
-  
-  /**
-   * Multi-line prompt.
-   *
-   * @param {String} str
-   * @param {Function} fn
-   * @api private
-   */
-  
-  Command.prototype.promptMultiLine = function(str, fn){
-    var buf = [];
-    console.log(str);
-    process.stdin.setEncoding('utf8');
-    process.stdin.on('data', function(val){
-      if ('\n' == val || '\r\n' == val) {
-        process.stdin.removeAllListeners('data');
-        fn(buf.join('\n'));
-      } else {
-        buf.push(val.trimRight());
-      }
-    }).resume();
-  };
-  
-  /**
-   * Prompt `str` and callback `fn(val)`
-   *
-   * Commander supports single-line and multi-line prompts.
-   * To issue a single-line prompt simply add white-space
-   * to the end of `str`, something like "name: ", whereas
-   * for a multi-line prompt omit this "description:".
-   *
-   *
-   * Examples:
-   *
-   *     program.prompt('Username: ', function(name){
-   *       console.log('hi %s', name);
-   *     });
-   *     
-   *     program.prompt('Description:', function(desc){
-   *       console.log('description was "%s"', desc.trim());
-   *     });
-   *
-   * @param {String|Object} str
-   * @param {Function} fn
-   * @api public
-   */
-  
-  Command.prototype.prompt = function(str, fn){
-    var self = this;
-  
-    if ('string' == typeof str) {
-      if (/ $/.test(str)) return this.promptSingleLine.apply(this, arguments);
-      this.promptMultiLine(str, fn);
-    } else {
-      var keys = Object.keys(str)
-        , obj = {};
-  
-      function next() {
-        var key = keys.shift()
-          , label = str[key];
-  
-        if (!key) return fn(obj);
-        self.prompt(label, function(val){
-          obj[key] = val;
-          next();
-        });
-      }
-  
-      next();
-    }
-  };
-  
-  /**
-   * Prompt for password with `str`, `mask` char and callback `fn(val)`.
-   *
-   * The mask string defaults to '', aka no output is
-   * written while typing, you may want to use "*" etc.
-   *
-   * Examples:
-   *
-   *     program.password('Password: ', function(pass){
-   *       console.log('got "%s"', pass);
-   *       process.stdin.destroy();
-   *     });
-   *
-   *     program.password('Password: ', '*', function(pass){
-   *       console.log('got "%s"', pass);
-   *       process.stdin.destroy();
-   *     });
-   *
-   * @param {String} str
-   * @param {String} mask
-   * @param {Function} fn
-   * @api public
-   */
-  
-  Command.prototype.password = function(str, mask, fn){
-    var self = this
-      , buf = '';
-  
-    // default mask
-    if ('function' == typeof mask) {
-      fn = mask;
-      mask = '';
-    }
-  
-    keypress(process.stdin);
-  
-    function setRawMode(mode) {
-      if (process.stdin.setRawMode) {
-        process.stdin.setRawMode(mode);
-      } else {
-        tty.setRawMode(mode);
-      }
-    };
-    setRawMode(true);
-    process.stdout.write(str);
-  
-    // keypress
-    process.stdin.on('keypress', function(c, key){
-      if (key && 'enter' == key.name) {
-        console.log();
-        process.stdin.pause();
-        process.stdin.removeAllListeners('keypress');
-        setRawMode(false);
-        if (!buf.trim().length) return self.password(str, mask, fn);
-        fn(buf);
-        return;
-      }
-  
-      if (key && key.ctrl && 'c' == key.name) {
-        console.log('%s', buf);
-        process.exit();
-      }
-  
-      process.stdout.write(mask);
-      buf += c;
-    }).resume();
-  };
-  
-  /**
-   * Confirmation prompt with `str` and callback `fn(bool)`
-   *
-   * Examples:
-   *
-   *      program.confirm('continue? ', function(ok){
-   *        console.log(' got %j', ok);
-   *        process.stdin.destroy();
-   *      });
-   *
-   * @param {String} str
-   * @param {Function} fn
-   * @api public
-   */
-  
-  
-  Command.prototype.confirm = function(str, fn, verbose){
-    var self = this;
-    this.prompt(str, function(ok){
-      if (!ok.trim()) {
-        if (!verbose) str += '(yes or no) ';
-        return self.confirm(str, fn, true);
-      }
-      fn(parseBool(ok));
-    });
-  };
-  
-  /**
-   * Choice prompt with `list` of items and callback `fn(index, item)`
-   *
-   * Examples:
-   *
-   *      var list = ['tobi', 'loki', 'jane', 'manny', 'luna'];
-   *      
-   *      console.log('Choose the coolest pet:');
-   *      program.choose(list, function(i){
-   *        console.log('you chose %d "%s"', i, list[i]);
-   *        process.stdin.destroy();
-   *      });
-   *
-   * @param {Array} list
-   * @param {Number|Function} index or fn
-   * @param {Function} fn
-   * @api public
-   */
-  
-  Command.prototype.choose = function(list, index, fn){
-    var self = this
-      , hasDefault = 'number' == typeof index;
-  
-    if (!hasDefault) {
-      fn = index;
-      index = null;
-    }
-  
-    list.forEach(function(item, i){
-      if (hasDefault && i == index) {
-        console.log('* %d) %s', i + 1, item);
-      } else {
-        console.log('  %d) %s', i + 1, item);
-      }
-    });
-  
-    function again() {
-      self.prompt('  : ', function(val){
-        val = parseInt(val, 10) - 1;
-        if (hasDefault && isNaN(val)) val = index;
-  
-        if (null == list[val]) {
-          again();
-        } else {
-          fn(val, list[val]);
-        }
-      });
-    }
-  
-    again();
-  };
-  
-  
-  /**
-   * Output help information for this command
-   *
-   * @api public
-   */
-  
-  Command.prototype.outputHelp = function(){
-    process.stdout.write(this.helpInformation());
-    this.emit('--help');
-  };
-  
-  /**
-   * Output help information and exit.
-   *
-   * @api public
-   */
-  
-  Command.prototype.help = function(){
-    this.outputHelp();
-    process.exit();
-  };
-  
-  /**
-   * Camel-case the given `flag`
-   *
-   * @param {String} flag
-   * @return {String}
-   * @api private
-   */
-  
-  function camelcase(flag) {
-    return flag.split('-').reduce(function(str, word){
-      return str + word[0].toUpperCase() + word.slice(1);
-    });
-  }
-  
-  /**
-   * Parse a boolean `str`.
-   *
-   * @param {String} str
-   * @return {Boolean}
-   * @api private
-   */
-  
-  function parseBool(str) {
-    return /^y|yes|ok|true$/i.test(str);
-  }
-  
-  /**
-   * Pad `str` to `width`.
-   *
-   * @param {String} str
-   * @param {Number} width
-   * @return {String}
-   * @api private
-   */
-  
-  function pad(str, width) {
-    var len = Math.max(0, width - str.length);
-    return str + Array(len + 1).join(' ');
-  }
-  
-  /**
-   * Output help information if necessary
-   *
-   * @param {Command} command to output help for
-   * @param {Array} array of options to search for -h or --help
-   * @api private
-   */
-  
-  function outputHelpIfNecessary(cmd, options) {
-    options = options || [];
-    for (var i = 0; i < options.length; i++) {
-      if (options[i] == '--help' || options[i] == '-h') {
-        cmd.outputHelp();
-        process.exit(0);
+      if (seamonkey) return {
+          seamonkey: t
+        , version: ua.match(/seamonkey\/(\d+(\.\d+)?)/i)[1]
       }
     }
-  }
+  
+    var bowser = detect()
+  
+    // Graded Browser Support
+    // http://developer.yahoo.com/yui/articles/gbs
+    if ((bowser.msie && bowser.version >= 7) ||
+        (bowser.chrome && bowser.version >= 10) ||
+        (bowser.firefox && bowser.version >= 4.0) ||
+        (bowser.safari && bowser.version >= 5) ||
+        (bowser.opera && bowser.version >= 10.0)) {
+      bowser.a = t;
+    }
+  
+    else if ((bowser.msie && bowser.version < 7) ||
+        (bowser.chrome && bowser.version < 10) ||
+        (bowser.firefox && bowser.version < 4.0) ||
+        (bowser.safari && bowser.version < 5) ||
+        (bowser.opera && bowser.version < 10.0)) {
+      bowser.c = t
+    } else bowser.x = t
+  
+    return bowser
+  })
   
 
-  provide("commander", module.exports);
+  provide("bowser", module.exports);
 
   $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /***************************************************************
+    * Traversty: A DOM collection management and traversal utility
+    * (c) Rod Vagg (@rvagg) 2012
+    * https://github.com/rvagg/traversty
+    * License: MIT
+    */
+  
+  !(function (name, definition) {
+    if (typeof module !== 'undefined') module.exports = definition()
+    else if (typeof define === 'function' && define.amd) define(name, definition)
+    else this[name] = definition()
+  }('traversty', function () {
+  
+    var context = this
+      , old = context.traversty
+      , doc = window.document
+      , html = doc.documentElement
+      , toString = Object.prototype.toString
+      , Ap = Array.prototype
+      , slice = Ap.slice
+        // feature test to find native matchesSelector()
+      , matchesSelector = (function (el, pfx, name, i, ms) {
+          while (i < pfx.length)
+            if (el[ms = pfx[i++] + name]) return ms
+        }(html, [ 'msM', 'webkitM', 'mozM', 'oM', 'm' ], 'atchesSelector', 0))
+  
+      , Kfalse = function () { return false }
+  
+      , isNumber = function (o) {
+          return toString.call(o) === '[object Number]'
+        }
+  
+      , isString = function (o) {
+          return toString.call(o) === '[object String]'
+        }
+  
+      , isFunction = function (o) {
+          return toString.call(o) === '[object Function]'
+        }
+  
+      , isUndefined = function (o) {
+          return o === void 0
+        }
+  
+      , isElement = function (o) {
+          return o && o.nodeType === 1
+        }
+  
+        // figure out which argument, if any, is our 'index'
+      , getIndex = function (selector, index) {
+          return isUndefined(selector) && !isNumber(index) ? 0 :
+            isNumber(selector) ? selector : isNumber(index) ? index : null
+        }
+  
+        // figure out which argument, if any, is our 'selector'
+      , getSelector = function (selector) {
+          return isString(selector) ? selector : '*'
+        }
+  
+      , nativeSelectorFind = function (selector, el) {
+          return slice.call(el.querySelectorAll(selector), 0)
+        }
+  
+      , nativeSelectorMatches = function (selector, el) {
+          return selector === '*' || el[matchesSelector](selector)
+        }
+  
+      , selectorFind = nativeSelectorFind
+  
+      , selectorMatches = nativeSelectorMatches
+  
+        // used in the case where our selector engine does out-of-order element returns for
+        // grouped selectors, e.g. '.class, tag', we need our elements in document-order
+        // so we do it ourselves if need be
+      , createUnorderedEngineSelectorFind = function(engineSelect, selectorMatches) {
+          return function (selector, el) {
+            if (/,/.test(selector)) {
+              var ret = [], i = -1, els = el.getElementsByTagName('*')
+              while (++i < els.length) {
+                if (isElement(els[i]) && selectorMatches(selector, els[i])) ret.push(els[i])
+              }
+              return ret
+            }
+            return engineSelect(selector, el)
+          }
+        }
+  
+        // is 'element' underneath 'container' somewhere
+      , isAncestor = 'compareDocumentPosition' in html
+          ? function (element, container) {
+              return (container.compareDocumentPosition(element) & 16) == 16
+            }
+          : 'contains' in html
+            ? function (element, container) {
+                container = container.nodeType === 9 || container == window ? html : container
+                return container !== element && container.contains(element)
+              }
+            : function (element, container) { // old smelly browser
+                while (element = element.parentNode) if (element === container) return 1
+                return 0
+              }
+  
+        // return an array containing only unique elements
+      , unique = function (ar) {
+          var a = [], i = -1, j, has
+          while (++i < ar.length) {
+            j = -1
+            has = false
+            while (++j < a.length) {
+              if (a[j] === ar[i]) {
+                has = true
+                break
+              }
+            }
+            if (!has) a.push(ar[i])
+          }
+          return a
+        }
+  
+        // for each element of 'els' execute 'fn' to get an array of elements to collect
+      , collect = function (els, fn) {
+          var ret = [], res, i = 0, j, l = els.length, l2
+          while (i < l) {
+            j = 0
+            l2 = (res = fn(els[i], i++)).length
+            while (j < l2) ret.push(res[j++])
+          }
+          return ret
+        }
+  
+       // generic DOM navigator to move multiple elements around the DOM
+     , move = function (els, method, selector, index, filterFn) {
+          index = getIndex(selector, index)
+          selector = getSelector(selector)
+          return collect(els
+            , function (el, elind) {
+                var i = index || 0, ret = []
+                if (!filterFn)
+                  el = el[method]
+                while (el && (index === null || i >= 0)) {
+                  // ignore non-elements, only consider selector-matching elements
+                  // handle both the index and no-index (selector-only) cases
+                  if (isElement(el)
+                      && (!filterFn || filterFn === true || filterFn(el, elind))
+                      && selectorMatches(selector, el)
+                      && (index === null || i-- === 0)) {
+                    // this concat vs push is to make sure we add elements to the result array
+                    // in reverse order when doing a previous(selector) and up(selector)
+                    index === null && method !== 'nextSibling' ? ret = [el].concat(ret) : ret.push(el)
+                  }
+                  el = el[method]
+                }
+                return ret
+              }
+          )
+        }
+  
+        // given an index & length, return a 'fixed' index, fixes non-numbers & neative indexes
+      , eqIndex = function (length, index, def) {
+          if (index < 0) index = length + index
+          if (index < 0 || index >= length) return null
+          return !index && index !== 0 ? def : index
+        }
+  
+        // collect elements of an array that match a filter function
+      , filter = function (els, fn) {
+          var arr = [], i = 0, l = els.length
+          for (; i < l; i++)
+            fn(els[i], i) && arr.push(els[i])
+          return arr
+        }
+  
+        // create a filter function, for use by filter(), is() & not()
+        // allows the argument to be an element, a function or a selector
+      , filterFn = function (slfn) {
+          var to
+          return isElement(slfn)
+            ? function (el) { return el === slfn }
+            : (to = typeof slfn) == 'function'
+              ? function (el, i) { return slfn.call(el, i) }
+              : to == 'string' && slfn.length
+                ? function (el) { return selectorMatches(slfn, el) }
+                : Kfalse
+        }
+  
+        // fn = !fn
+      , inv = function (fn) {
+          return function () {
+            return !fn.apply(this, arguments)
+          }
+        }
+  
+      , traversty = (function () {
+          function T(els) {
+            this.length = 0
+            if (els) {
+              els = unique(!els.nodeType && !isUndefined(els.length) ? els : [ els ])
+              var i = this.length = els.length
+              while (i--) this[i] = els[i]
+            }
+          }
+  
+          T.prototype = {
+              down: function (selector, index) {
+                index = getIndex(selector, index)
+                selector = getSelector(selector)
+                return traversty(collect(this
+                  , function (el) {
+                      var f = selectorFind(selector, el)
+                      return index === null ? f : ([ f[index] ] || [])
+                    }
+                  ))
+              }
+  
+            , up: function (selector, index) {
+                return traversty(move(this, 'parentNode', selector, index))
+              }
+  
+            , parents: function () {
+                return T.prototype.up.apply(this, arguments.length ? arguments : [ '*' ])
+              }
+  
+            , closest: function (selector, index) {
+                if (isNumber(selector)) {
+                  index = selector
+                  selector = '*'
+                } else if (!isString(selector)) {
+                  return traversty([])
+                } else if (!isNumber(index)) {
+                  index = 0
+                }
+                return traversty(move(this, 'parentNode', selector, index, true))
+              }
+  
+            , previous: function (selector, index) {
+                return traversty(move(this, 'previousSibling', selector, index))
+              }
+  
+            , next: function (selector, index) {
+                return traversty(move(this, 'nextSibling', selector, index))
+              }
+  
+            , siblings: function (selector, index) {
+                var self = this
+                  , arr = slice.call(this, 0)
+                  , i = 0, l = arr.length
+                for (; i < l; i++) {
+                  arr[i] = arr[i].parentNode.firstChild
+                  while (!isElement(arr[i])) arr[i] = arr[i].nextSibling
+                }
+                if (isUndefined(selector))
+                  selector = '*'
+  
+                return traversty(move(arr, 'nextSibling', selector || '*', index
+                      , function (el, i) { return el !== self[i] } // filter
+                    ))
+              }
+  
+            , children: function (selector, index) {
+                return traversty(move(T.prototype.down.call(this), 'nextSibling', selector || '*', index, true))
+              }
+  
+            , first: function () {
+                return T.prototype.eq.call(this, 0)
+              }
+  
+            , last: function () {
+                return T.prototype.eq.call(this, -1)
+              }
+  
+            , eq: function (index) {
+                return traversty(this.get(index))
+              }
+  
+            , get: function (index) {
+                return this[eqIndex(this.length, index, 0)]
+              }
+  
+              // a crazy man wrote this, don't try to understand it, see the tests
+            , slice: function (start, end) {
+                var e = end, l = this.length, arr = []
+                start = eqIndex(l, Math.max(-this.length, start), 0)
+                e = eqIndex(end < 0 ? l : l + 1, end, l)
+                end = e === null || e > l ? end < 0 ? 0 : l : e
+                while (start !== null && start < end)
+                  arr.push(this[start++])
+                return traversty(arr)
+              }
+  
+            , filter: function (slfn) {
+                return traversty(filter(this, filterFn(slfn)))
+              }
+  
+            , not: function (slfn) {
+                return traversty(filter(this, inv(filterFn(slfn))))
+              }
+  
+              // similar to filter() but cares about descendent elements
+            , has: function (slel) {
+                return traversty(filter(
+                    this
+                  , isElement(slel)
+                      ? function (el) { return isAncestor(slel, el) }
+                      : typeof slel == 'string' && slel.length
+                        ? function (el) { return selectorFind(slel, el).length } //TODO: performance
+                        : Kfalse
+                ))
+              }
+  
+              // same as filter() but return a boolean so quick-return after first successful find
+            , is: function (slfn) {
+                var i = 0, l = this.length
+                  , fn = filterFn(slfn)
+                for (; i < l; i++)
+                  if (fn(this[i], i)) return true
+                return false
+              }
+  
+            , toArray: function () { return Ap.slice.call(this) }
+  
+            , size: function () { return this.length }
+  
+            , each: function (fn, ctx) {
+                var i = 0, l = this.length
+                for (; i < l; i++)
+                  fn.call(ctx || this[i], this[i], i, this)
+                return this
+              }
+  
+              // quack like a duck (Array)
+            , push: Ap.push
+            , sort: Ap.sort
+            , splice: Ap.splice
+          }
+  
+          T.prototype.prev = T.prototype.previous
+  
+          function t(els) {
+            return new T(isString(els) ? selectorFind(els, doc) : els)
+          }
+  
+          // extend traversty functionality with custom methods
+          t.aug = function (methods) {
+            var key, method
+            for (key in methods) {
+              method = methods[key]
+              if (typeof method == 'function') {
+                T.prototype[key] = method
+              }
+            }
+          }
+  
+  
+          t.setSelectorEngine = function (s) {
+            // feature testing the selector engine like a boss
+            var ss, r, a, _selectorMatches, _selectorFind
+              , e = doc.createElement('p')
+              , select = s.select || s.sel || s
+  
+            e.innerHTML = '<a/><i/><b/>'
+            a = e.firstChild
+            try {
+              // YO! I HEARD YOU LIKED NESTED TERNARY OPERATORS SO I COOKED SOME UP FOR YOU!
+              // (one day I might loop this...)
+  
+              // check to see how we do a matchesSelector
+              _selectorMatches = isFunction(s.matching)
+                ? function (selector, el) { return s.matching([el], selector).length > 0 }
+                : isFunction(s.is)
+                  ? function (selector, el) { return s.is(el, selector) }
+                  : isFunction(s.matchesSelector)
+                    ? function (selector, el) { return s.matchesSelector(el, selector) }
+                    : isFunction(s.match)
+                      ? function (selector, el) { return s.match(el, selector) }
+                      : isFunction(s.matches)
+                        ? function (selector, el) { return s.matches(el, selector) }
+                        : null
+  
+              if (!_selectorMatches) {
+                // perhaps it's an selector(x).is(y) type selector?
+                ss = s('a', e)
+                _selectorMatches = isFunction(ss._is)
+                  ? function (selector, el) { return s(el)._is(selector) } // original .is(), replaced by Enderbridge
+                  : isFunction(ss.matching)
+                    ? function (selector, el) { return s(el).matching(selector).length > 0 }
+                    : isFunction(ss.is) && !ss.is.__ignore
+                      ? function (selector, el) { return s(el).is(selector) }
+                        : isFunction(ss.matchesSelector)
+                          ? function (selector, el) { return s(el).matchesSelector(selector) }
+                          : isFunction(ss.match)
+                            ? function (selector, el) { return s(el).match(selector) }
+                            : isFunction(ss.matches)
+                              ? function (selector, el) { return s(el).matches(selector) }
+                              : null
+              }
+  
+              if (!_selectorMatches)
+                  throw new Error('Traversty: couldn\'t find selector engine\'s `matchesSelector`')
+  
+              // verify that we have a working `matchesSelector`
+              if (_selectorMatches('x,y', e) || !_selectorMatches('a,p', e))
+                  throw new Error('Traversty: couldn\'t make selector engine\'s `matchesSelector` work')
+  
+              // basic select
+              if ((r = select('b,a', e)).length !== 2) throw new Error('Traversty: don\'t know how to use this selector engine')
+              // check to see if the selector engine has given us the results in document-order
+              // and if not, work around it
+              _selectorFind = r[0] === a ? select : createUnorderedEngineSelectorFind(select, _selectorMatches)
+              // have we done enough to get a working `selectorFind`?
+              if ((r = _selectorFind('b,a', e)).length !== 2 || r[0] !== a)
+                throw new Error('Traversty: couldn\'t make selector engine work')
+  
+              selectorMatches = _selectorMatches
+              selectorFind = _selectorFind
+            } catch (ex) {
+              if (isString(ex)) throw ex
+              throw new Error('Traversty: error while figuring out how the selector engine works: ' + (ex.message || ex))
+            } finally {
+              e = null
+            }
+  
+            return t
+          }
+  
+          t.noConflict = function () {
+            context.traversty = old
+            return this
+          }
+  
+          return t
+        }())
+   
+    return traversty
+  }));
+  
+
+  provide("traversty", module.exports);
+
+  /*global ender:true*/
+  
+  (function ($) {
+    var t = require('traversty')
+      , integrated = false
+      , integrate = function (meth) {
+          // this crazyness is for lazy initialisation because we can't be guaranteed
+          // that a selector engine has been installed *before* traversty in an ender build
+          var fn = function (self, selector, index) {
+              if (!integrated) {
+                try {
+                  t.setSelectorEngine($)
+                } catch (ex) { } // ignore exception, we may have an ender build with no selector engine
+                integrated = true
+              }
+              fn = meth == 'is'
+                ? function (self, slfn) {
+                    return t(self)[meth](slfn) // boolean
+                  }
+                : function (self, selector, index) {
+                    return $(t(self)[meth](selector, index)) // collection
+                  }
+              return fn(self, selector, index)
+            }
+          return function (selector, index) { return fn(this, selector, index) }
+        }
+      , methods = 'up down next previous prev parents closest siblings children first last eq slice filter not is has'.split(' ')
+      , b = {}, i = methods.length
+  
+    // does this build have an .is()? if so, shift it to _is() for traversty to use and
+    // allow us to integrate a new is(), wrapped around it
+    if ($.fn.is) $.fn._is = $.fn.is
+    while (--i >= 0) b[methods[i]] = integrate(methods[i])
+    $.ender(b, true)
+    $.fn.is.__ignore = true
+  }(ender))
 
 }());
 
