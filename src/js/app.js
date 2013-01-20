@@ -114,7 +114,7 @@
         /**
          * Clears route.
          */
-        clear : function() {
+        clear : function(total) {
             if (this.origin) {
                 this.origin.setMap(null);
                 delete this.origin;
@@ -123,6 +123,7 @@
                 this.destination.setMap(null);
                 delete this.destination;
             }
+            event.fire(this, 'route_updated', this.route);
         }
 
     };
