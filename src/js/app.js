@@ -147,7 +147,7 @@
          */
         retrieveCategories : function() {
             $.ajax({
-                        url : 'selected_categories.json',
+                        url : 'categories.json', //'selected_categories.json',
                         method : 'get',
                         type : 'json',
                         success : function(response) {
