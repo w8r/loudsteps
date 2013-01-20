@@ -52,6 +52,10 @@
 #settings ul li .btn {
   vertical-align: top;
 }
+#settings input.genres {
+  display: block;
+  float: left;
+}
 .icon.icon-foursquare,
 .icon.icon-echonest {
   background-position: top left;
