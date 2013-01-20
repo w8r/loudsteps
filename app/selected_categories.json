@@ -30,15 +30,6 @@
                 "suffix" : ".png"
             }
         }, {
-            "id" : "4bf58dd8d48988d190941735",
-            "name" : "History Museum",
-            "pluralName" : "History Museums",
-            "shortName" : "History Museum",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/museum_history_",
-                "suffix" : ".png"
-            }
-        }, {
             "id" : "4bf58dd8d48988d191941735",
             "name" : "Science Museum",
             "pluralName" : "Science Museums",
@@ -48,50 +39,12 @@
                 "suffix" : ".png"
             }
         }, {
-            "id" : "4bf58dd8d48988d1e7931735",
-            "name" : "Jazz Club",
-            "pluralName" : "Jazz Clubs",
-            "shortName" : "Jazz Club",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/musicvenue_jazzclub_",
-                "suffix" : ".png"
-            }
-        }, {
-            "id" : "4bf58dd8d48988d1e8931735",
-            "name" : "Piano Bar",
-            "pluralName" : "Piano Bars",
-            "shortName" : "Piano Bar",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/musicvenue_pianobar_",
-                "suffix" : ".png"
-            }
-        }, {
             "id" : "4bf58dd8d48988d184941735",
             "name" : "Stadium",
             "pluralName" : "Stadiums",
             "shortName" : "Stadium",
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/stadium_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d16e941735",
-            "name" : "Fast Food Restaurant",
-            "pluralName" : "Fast Food Restaurants",
-            "shortName" : "Fast Food",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/food/fastfood_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d111941735",
-            "name" : "Japanese Restaurant",
-            "pluralName" : "Japanese Restaurants",
-            "shortName" : "Japanese",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/food/japanese_",
                 "suffix" : ".png"
             },
             "categories" : []
@@ -136,16 +89,6 @@
             },
             "categories" : []
         }, {
-            "id" : "4bf58dd8d48988d15d941735",
-            "name" : "Lighthouse",
-            "pluralName" : "Lighthouses",
-            "shortName" : "Lighthouse",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/lighthouse_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
             "id" : "5032848691d4c4b30a586d61",
             "name" : "Volcano",
             "pluralName" : "Volcanos",
@@ -165,15 +108,6 @@
                 "suffix" : ".png"
             },
             "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d126941735",
-            "name" : "Government Building",
-            "pluralName" : "Government Buildings",
-            "shortName" : "Government",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/building/government_",
-                "suffix" : ".png"
-            }
         }, {
             "id" : "4bf58dd8d48988d132941735",
             "name" : "Church",
@@ -210,16 +144,6 @@
             "shortName" : "Airport",
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_",
-                "suffix" : ".png"
-            },
-            "categories" : []
-        }, {
-            "id" : "4bf58dd8d48988d1f9931735",
-            "name" : "Road",
-            "pluralName" : "Roads",
-            "shortName" : "Road",
-            "icon" : {
-                "prefix" : "https://foursquare.com/img/categories_v2/travel/highway_",
                 "suffix" : ".png"
             },
             "categories" : []
