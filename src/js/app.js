@@ -299,7 +299,7 @@
                             preventSubmitOnEnter : true,
                             typeahead : true,
                             typeaheadAjaxSource : null,
-                            typeaheadSource : this.getGenres().bind(this)
+                            typeaheadSource : this.getGenres.bind(this)
                         });
             }.bind(this));
         },
