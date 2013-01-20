@@ -286,10 +286,11 @@
                 console.log(options, {
                             name : this.name
                         });
-                var request = new Request(options, {
+                try{var request = new Request(options, {
                             name : this.name
                         });
-                console.log(request);
+                }catch(e){
+                console.log(request, e);}
                 request.get(this.endPoint + 'images', function(response) {
                             callback(new ImageCollection(response.getData()));
                         });
