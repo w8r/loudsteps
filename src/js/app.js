@@ -148,6 +148,8 @@
 
     Foursquare.prototype = {
 
+        markers : [],
+
         /**
          * Retrieves categories cache
          */
@@ -224,7 +226,14 @@
                             position : new google.maps.LatLng(poi.location.lat,
                                     poi.location.lng)
                         });
+                this.markers.push(marker);
             }
+        },
+
+        clearPOIs : function() {
+            do {
+                this.markers.pop().setMap(null);
+            } while (this.markers.length);
         }
     };
 
