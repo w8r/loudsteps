@@ -379,7 +379,7 @@
                             typeaheadAjaxSource : null,
                             typeaheadSource : this.getGenres.bind(this)
                         });
-            });
+            }.bind(this));
         },
 
         /**
