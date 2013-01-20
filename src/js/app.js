@@ -299,7 +299,7 @@
                             typeaheadAjaxSource : null,
                             typeaheadSource : this.getGenres()
                         });
-            });
+            }.bind(this));
         },
 
         getGenresSelect : function(genres, selection) {
