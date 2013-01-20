@@ -309,6 +309,7 @@
 
                 trigger.click(function() {
                             var el = $(this);
+                            console.log(el.find('.icon')[0])
                             if (el.hasClass('icon-tag')) {
                                 el.find('.icon').removeClass('icon-tag')
                                         .addClass('icon-chevron-left');
