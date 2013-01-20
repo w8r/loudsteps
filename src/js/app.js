@@ -364,10 +364,11 @@
                                 input.addClass('hide');
                             }
                         });
+                        console.log(input.data('genres'));
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
-                            prefilled : (input.data('genres') || '').split(','),
+                            prefilled : input.data('genres').split(','),
                             preventSubmitOnEnter : true,
                             typeahead : true,
                             typeaheadAjaxSource : null,
