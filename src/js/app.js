@@ -427,7 +427,7 @@
                                 + category.id
                                 + '" data-provide="typeahead" '
                                 + 'data-genres="" autocomplete="off" />'
-                                + '<span class="btn"><i class="icon icon-tag">'
+                                + '<span class="btn btn-mini"><i class="icon icon-tag">'
                                 + '</i></span></div>'
                                 + '<label class="checkbox" for="category-checkbox-'
                                 + category.id
