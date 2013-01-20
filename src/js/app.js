@@ -369,7 +369,6 @@
             var genres = _.map(this.genres, function(genre) {
                         return genre.name;
                     });
-            console.log(genres, this.genres);
             return genres;
         },
 
