@@ -230,6 +230,9 @@
             }
         },
 
+        /**
+         * Clears categories markers.
+         */
         clearPOIs : function() {
             do {
                 this.markers.pop().setMap(null);
