@@ -304,7 +304,7 @@
             this.genres = genres;
             $('#categories-filter .tagManager').each(function(input) {
                 input = $(input);
-                console.log(input.previous());
+                console.log(input.previous()[0]);
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
