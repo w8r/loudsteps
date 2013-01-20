@@ -227,7 +227,7 @@
             event.on(this.poiSource, 'categories_received',
                     this.renderCategories.bind(this));
             event.on(this.router, 'route_updated', function(route) {
-                        var routless = !route;
+                        var routeless = !route;
                         $('#explore-button').attr('disabled', routeless)[routeless
                                 ? 'addClass'
                                 : 'removeClass']('disabled');
