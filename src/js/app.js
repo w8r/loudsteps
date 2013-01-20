@@ -273,6 +273,8 @@
          */
         defaultZoom : 14,
 
+        genres : [],
+
         /**
          * Inits controllers.
          */
@@ -348,6 +350,12 @@
             return res;
         },
 
+        getGenres : function() {
+            return _.map(this.genres, function(genre) {
+                        return genre.name;
+                    });
+        },
+
         /**
          * Applies pre-stored preset
          * 
@@ -363,12 +371,15 @@
             $('#categories-filter').html(this.renderCategoriesRaw(this
                     .applyPreset(categories)));
             $('#categories-filter .tagManager').each(function(input) {
-                        input = $(input);
-                        input.tagsManager({
-                                    prefilled : (input.data('genres') || '')
-                                            .split(',')
-                                });
-                    });
+                input = $(input);
+                input.tagsManager({
+                            prefilled : (input.data('genres') || '').split(','),
+                            preventSubmitOnEnter : true,
+                            typeahead : true,
+                            typeaheadAjaxSource : null,
+                            typeaheadSource : this.getGenres.bind(this)
+                        });
+            });
         },
 
         /**
@@ -385,7 +396,7 @@
                                 + category.id
                                 + '" checked="true"> '
                                 + category.name
-                                + '<input type="text" class="tagManager" data-genres="" /></label>';
+                                + '<input type="text" class="tagManager" data-genres="" autocomplete="off" /></label>';
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
                 }
