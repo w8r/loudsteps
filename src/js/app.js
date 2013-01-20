@@ -312,13 +312,14 @@
                             if (icon.hasClass('icon-tag')) {
                                 icon.removeClass('icon-tag')
                                         .addClass('icon-chevron-left')
-                                        .parent('div').addClass('input-append')
+                                        .parent('.inline-control')
+                                        .addClass('input-append')
                                         .removeClass('inline-control');
                                 input.removeClass('hide');
                             } else {
                                 icon.addClass('icon-tag')
                                         .removeClass('icon-chevron-left')
-                                        .parent('div')
+                                        .parent('.input-append')
                                         .removeClass('input-append')
                                         .addClass('inline-control');
                                 input.addClass('hide');
