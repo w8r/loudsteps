@@ -245,7 +245,7 @@
 
                 circle = new google.maps.Circle({
                             center : pos,
-                            radius : 100 * Math.random(),
+                            radius : 300 * Math.random(),
                             strokeColor : '#11b6f7',
                             fillColor : '#009bd9',
                             fillOpacity : 0.2,
