@@ -62,6 +62,7 @@
 }
 #settings ul li .btn {
   vertical-align: top;
+  margin-right: 4px;
 }
 .genres {
   display: block;
