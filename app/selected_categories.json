@@ -1,5 +1,10 @@
 {
     "response" : {
+        genres : ["art rock,avant-garde",
+                "neue deutsche harte,neo-progressive",
+                "traditional blues,folk rock,classical", "ambient,space rock",
+                "metalcore", "industrial,martial industrial", "", "noise rock",
+                "ambient,rock en espanol", "minimal"],
         "categories" : [{
             "id" : "4bf58dd8d48988d18f941735",
             "name" : "Art Museum",
@@ -8,7 +13,8 @@
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/museum_art_",
                 "suffix" : ".png"
-            }
+            },
+            "genres" : "art rock,avant-garde"
         }, {
             "id" : "4bf58dd8d48988d191941735",
             "name" : "Science Museum",
@@ -17,7 +23,8 @@
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/arts_entertainment/museum_science_",
                 "suffix" : ".png"
-            }
+            },
+            "genres" : "neue deutsche harte,neo-progressive"
         }, {
             "id" : "4bf58dd8d48988d15c941735",
             "name" : "Cemetery",
@@ -27,7 +34,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/cemetery_",
                 "suffix" : ".png"
             },
-            "categories" : []
+            "genres" : "traditional blues,folk rock,classical"
         }, {
             "id" : "4bf58dd8d48988d161941735",
             "name" : "Lake",
@@ -37,7 +44,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/lake_",
                 "suffix" : ".png"
             },
-            "categories" : []
+            "genres" : "ambient,space rock"
         }, {
             "id" : "5032848691d4c4b30a586d61",
             "name" : "Volcano",
@@ -47,7 +54,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/parks_outdoors/default_",
                 "suffix" : ".png"
             },
-            "categories" : []
+            "genres" : "metalcore"
         }, {
             "id" : "4eb1bea83b7b6f98df247e06",
             "name" : "Factory",
@@ -57,7 +64,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/building/factory_",
                 "suffix" : ".png"
             },
-            "categories" : []
+            "genres" : "industrial,martial industrial"
         }, {
             "id" : "4bf58dd8d48988d132941735",
             "name" : "Church",
@@ -66,7 +73,8 @@
             "icon" : {
                 "prefix" : "https://foursquare.com/img/categories_v2/building/religious_church_",
                 "suffix" : ".png"
-            }
+            },
+            "genres" : "classical"
         }, {
             "id" : "50be8ee891d4fa8dcc7199a7",
             "name" : "Market",
@@ -76,7 +84,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/shops/default_",
                 "suffix" : ".png"
             },
-            "categories" : []
+            "genres" : "noise rock"
         }, {
             "id" : "4bf58dd8d48988d1ed931735",
             "name" : "Airport",
@@ -86,7 +94,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/travel/airport_",
                 "suffix" : ".png"
             },
-            "categories" : []
+            "genres" : "ambient,rock en espanol"
         }, {
             "id" : "4bf58dd8d48988d129951735",
             "name" : "Train Station",
@@ -96,7 +104,7 @@
                 "prefix" : "https://foursquare.com/img/categories_v2/travel/trainstation_",
                 "suffix" : ".png"
             },
-            "categories" : []
+            "genres" : "minimal"
         }]
     }
 }
