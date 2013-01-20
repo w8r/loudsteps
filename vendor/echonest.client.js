@@ -66,7 +66,7 @@
                             html += compiled(item);
                         });
                 html = html.replace(/undefined/, ''); // TODO, why is this
-                                                        // being inserted!?
+                // being inserted!?
 
             } else {
                 throw new Error('Could not determine engine type.');
@@ -166,13 +166,13 @@
                 };
 
                 $.extend(data, this.extendedDetails); // merge in extended
-                                                        // details, this allows
-                                                        // customised calls
+                // details, this allows
+                // customised calls
 
                 return {
                     url : url() + options.endPoint,
-                    dataType : 'jsonp',
-                    type : options.type,
+                    type : 'jsonp',
+                    method : options.method,
                     data : data,
                     cache : true,
                     success : function(data, textStatus, XMLHttpRequest) {
@@ -189,7 +189,7 @@
             $.ajax(this.settings({
                         endPoint : endPoint,
                         success : callbackSuccess,
-                        type : 'GET'
+                        method : 'GET'
                     }));
         }
 
@@ -206,244 +206,247 @@
          * 
          * @returns A collection object.
          */
-        Artist.prototype.audio = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'audio', function(response) {
-                        callback(new AudioCollection(response.getData()));
-                    });
-        }
+        Artist.prototype = {
+            audio : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'audio', function(response) {
+                            callback(new AudioCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get all biographies associated with this artist.
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.biographies = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'biographies', function(response) {
-                        callback(new BiographyCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get all biographies associated with this artist.
+             * 
+             * @returns A collection object.
+             */
+            biographies : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'biographies', function(response) {
+                            callback(new BiographyCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get all blogs associated with this artist.
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.blogs = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'blogs', function(response) {
-                        callback(new BlogCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get all blogs associated with this artist.
+             * 
+             * @returns A collection object.
+             */
+            blogs : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'blogs', function(response) {
+                            callback(new BlogCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get the familiarity of this artist.
-         * 
-         * @returns AA collection object.
-         */
-        Artist.prototype.familiarity = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'familiarity', function(response) {
-                        callback(new Familiarity(response.getData()));
-                    });
-        }
+            /**
+             * Get the familiarity of this artist.
+             * 
+             * @returns AA collection object.
+             */
+            familiarity : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'familiarity', function(response) {
+                            callback(new Familiarity(response.getData()));
+                        });
+            },
 
-        /**
-         * Get the hotttnesss of this artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.hotttnesss = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'hotttnesss', function(response) {
-                        callback(new Hotttnesss(response.getData()));
-                    });
-        }
+            /**
+             * Get the hotttnesss of this artist
+             * 
+             * @returns A collection object.
+             */
+            hotttnesss : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'hotttnesss', function(response) {
+                            callback(new Hotttnesss(response.getData()));
+                        });
+            },
 
-        /**
-         * Get all images associated with this artist.
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.images = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'images', function(response) {
-                        callback(new ImageCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get all images associated with this artist.
+             * 
+             * @returns A collection object.
+             */
+            images : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'images', function(response) {
+                            callback(new ImageCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get the new about an artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.news = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'news', function(response) {
-                        callback(new NewsCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get the new about an artist
+             * 
+             * @returns A collection object.
+             */
+            news : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'news', function(response) {
+                            callback(new NewsCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get the new about an artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.profile = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'profile', function(response) {
-                        callback(new Profile(response.getData()));
-                    });
-        }
+            /**
+             * Get the new about an artist
+             * 
+             * @returns A collection object.
+             */
+            profile : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'profile', function(response) {
+                            callback(new Profile(response.getData()));
+                        });
+            },
 
-        /**
-         * Get reviews about an artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.reviews = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'reviews', function(response) {
-                        callback(new ReviewsCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get reviews about an artist
+             * 
+             * @returns A collection object.
+             */
+            reviews : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'reviews', function(response) {
+                            callback(new ReviewsCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get search results about an artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.search = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'search', function(response) {
-                        callback(new SearchResultsCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get search results about an artist
+             * 
+             * @returns A collection object.
+             */
+            search : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'search', function(response) {
+                            callback(new SearchResultsCollection(response
+                                    .getData()));
+                        });
+            },
 
-        /**
-         * Get songs written by an artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.songs = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'songs', function(response) {
-                        callback(new SongsCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get songs written by an artist
+             * 
+             * @returns A collection object.
+             */
+            songs : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'songs', function(response) {
+                            callback(new SongsCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get similar artists to the one specified
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.similar = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'similar', function(response) {
-                        callback(new SimilarCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get similar artists to the one specified
+             * 
+             * @returns A collection object.
+             */
+            similar : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'similar', function(response) {
+                            callback(new SimilarCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get terms used to describe an artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.terms = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'terms', function(response) {
-                        callback(new TermsCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get terms used to describe an artist
+             * 
+             * @returns A collection object.
+             */
+            terms : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'terms', function(response) {
+                            callback(new TermsCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get top "hottt" artists
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.top_hottt = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'top_hottt', function(response) {
-                        callback(new TopHotttCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get top "hottt" artists
+             * 
+             * @returns A collection object.
+             */
+            top_hottt : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'top_hottt', function(response) {
+                            callback(new TopHotttCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get top terms
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.top_terms = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'top_terms', function(response) {
-                        callback(new TopTermsCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get top terms
+             * 
+             * @returns A collection object.
+             */
+            top_terms : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'top_terms', function(response) {
+                            callback(new TopTermsCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get top terms
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.urls = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'urls', function(response) {
-                        callback(new UrlsCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get top terms
+             * 
+             * @returns A collection object.
+             */
+            urls : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'urls', function(response) {
+                            callback(new UrlsCollection(response.getData()));
+                        });
+            },
 
-        /**
-         * Get videos for artist
-         * 
-         * @returns A collection object.
-         */
-        Artist.prototype.video = function(callback, options) {
-            var request = new Request(options, {
-                        name : this.name
-                    });
-            request.get(this.endPoint + 'video', function(response) {
-                        callback(new VideoCollection(response.getData()));
-                    });
-        }
+            /**
+             * Get videos for artist
+             * 
+             * @returns A collection object.
+             */
+            video : function(callback, options) {
+                var request = new Request(options, {
+                            name : this.name
+                        });
+                request.get(this.endPoint + 'video', function(response) {
+                            callback(new VideoCollection(response.getData()));
+                        });
+            }
+        };
 
         /**
          * Base class used for singular items returned from the API.
          */
         var Singular = function() {
-        }
+        };
 
         /**
          * Getter for the data stored in the singular.
@@ -465,8 +468,8 @@
          */
         var Collection = function() {
             this.workingWith = null; // used if we want to work with a
-                                        // singular item out of the collection.
-        };
+                // singular item out of the collection.
+            };
 
         /**
          * Getter for the data stored in the collection. If working with is set,
@@ -474,72 +477,74 @@
          * 
          * @returns Array Data stored on the collection.
          */
-        Collection.prototype.getData = function() {
-            return (this.getWorkingWith()) ? this.data[this.name][this
-                    .getWorkingWith()] : this.data[this.name]
-        }
+        Collection.prototype = {
+            getData : function() {
+                return (this.getWorkingWith()) ? this.data[this.name][this
+                        .getWorkingWith()] : this.data[this.name]
+            },
 
-        Collection.prototype.setWorkingWith = function(count) {
-            this.workingWith = count;
-            return this.workingWith;
-        }
+            setWorkingWith : function(count) {
+                this.workingWith = count;
+                return this.workingWith;
+            },
 
-        Collection.prototype.getWorkingWith = function(count) {
-            return this.workingWith;
-        }
+            getWorkingWith : function(count) {
+                return this.workingWith;
+            },
 
-        /**
-         * Returns where results recieved from the server started from.
-         * 
-         * @returns Integer Start point
-         */
-        Collection.prototype.start = function(count) {
-            return parseInt(this.data.start, 10);
-        }
+            /**
+             * Returns where results recieved from the server started from.
+             * 
+             * @returns Integer Start point
+             */
+            start : function(count) {
+                return parseInt(this.data.start, 10);
+            },
 
-        /**
-         * Returns a total count for the collection on the server
-         * 
-         * @returns Integer Total results available on the server
-         */
-        Collection.prototype.total = function(count) {
-            return parseInt(this.data.total, 10);
-        }
+            /**
+             * Returns a total count for the collection on the server
+             * 
+             * @returns Integer Total results available on the server
+             */
+            total : function(count) {
+                return parseInt(this.data.total, 10);
+            },
 
-        /**
-         * Returns the size of the collection
-         * 
-         * @returns Integer Number of items in the collection
-         */
-        Collection.prototype.size = function(count) {
-            return this.getData().length;
-        }
+            /**
+             * Returns the size of the collection
+             * 
+             * @returns Integer Number of items in the collection
+             */
+            size : function(count) {
+                return this.getData().length;
+            },
 
-        /**
-         * Used to interact with a collection of images
-         * 
-         * @returns String Formatted according to the template passed in.
-         */
-        Collection.prototype.to_html = function(template, options) {
-            if (this.size() < 1) {
-                throw new RangeError('Empty collection')
+            /**
+             * Used to interact with a collection of images
+             * 
+             * @returns String Formatted according to the template passed in.
+             */
+            to_html : function(template, options) {
+                if (this.size() < 1) {
+                    throw new RangeError('Empty collection')
+                }
+                return toTemplate(template, this.getData(), options)
+            },
+
+            /**
+             * Set a specific item in the collection to work with. Setting this
+             * will make the collection always work with that item until set
+             * again. To go back to working with the full collection, set to any
+             * non integer value.
+             * 
+             * @returns String Formatted according to the template passed in.
+             */
+            at : function(count) {
+                (isInteger(count)) ? this.setWorkingWith(count) : this
+                        .setWorkingWith(null);
+                return this;
             }
-            return toTemplate(template, this.getData(), options)
-        }
-
-        /**
-         * Set a specific item in the collection to work with. Setting this will
-         * make the collection always work with that item until set again. To go
-         * back to working with the full collection, set to any non integer
-         * value.
-         * 
-         * @returns String Formatted according to the template passed in.
-         */
-        Collection.prototype.at = function(count) {
-            (isInteger(count)) ? this.setWorkingWith(count) : this
-                    .setWorkingWith(null);
-            return this;
-        }
+        };
 
         /**
          * Used to interact with a collection of audio objects Inherits from
