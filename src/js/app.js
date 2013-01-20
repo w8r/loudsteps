@@ -311,16 +311,15 @@
                             var icon = $(this).find('.icon');
                             if (icon.hasClass('icon-tag')) {
                                 icon.removeClass('icon-tag')
-                                        .addClass('icon-chevron-left')
-                                        .parent('.inline-control')
-                                        .addClass('input-append')
+                                        .addClass('icon-chevron-left');
+                                input.parent().addClass('input-append')
                                         .removeClass('inline-control');
+
                                 input.removeClass('hide');
                             } else {
                                 icon.addClass('icon-tag')
-                                        .removeClass('icon-chevron-left')
-                                        .parent('.input-append')
-                                        .removeClass('input-append')
+                                        .removeClass('icon-chevron-left');
+                                input.parent().removeClass('input-append')
                                         .addClass('inline-control');
                                 input.addClass('hide');
                             }
