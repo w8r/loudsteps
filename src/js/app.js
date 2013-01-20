@@ -171,7 +171,7 @@
         explore : function(bounds, categories, callback) {
             var sw = bounds.getSouthWest(),
                 ne = bounds.getNorthEast();
-            this.client.search({
+            this.client.venuesClient.search({
                         intent : 'browse',
                         categoryId : categories || null,
                         ne : [sw.lat(), sw.lng()],
