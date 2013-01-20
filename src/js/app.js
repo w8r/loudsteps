@@ -404,11 +404,11 @@
                                 + category.id
                                 + '" checked="true"> '
                                 + category.name
+                                + '</label>'
                                 + '<input type="text" class="tagManager genres" '
-                                + 'name="genres-'
-                                + category.id
+                                + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
-                                + 'data-genres="" autocomplete="off" /></label>';
+                                + 'data-genres="" autocomplete="off" />';
                 if (category.categories && category.categories.length !== 0) {
                     html += this.renderCategoriesRaw(category.categories);
                 }
