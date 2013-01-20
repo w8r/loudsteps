@@ -292,7 +292,9 @@
             this.genres = genres;
             $('#categories-filter .tagManager').each(function(input) {
                 input = $(input);
-                input.tagsManager({
+                input.click(function(evt) {
+                            evt.stopPropagation();
+                        }).tagsManager({
                             prefilled : (input.data('genres') || '').split(','),
                             preventSubmitOnEnter : true,
                             typeahead : true,
