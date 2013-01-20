@@ -71,6 +71,8 @@
 		<copy file="app/index.html" tofile="index.html" overwrite="true" />
 		<copy file="app/categories.json" tofile="categories.json" overwrite="true" />
 		<gzip src="categories.json" destfile="categories.json.gz" />
+		<copy file="app/selected_categories.json" tofile="selected_categories.json" overwrite="true" />
+		<gzip src="selected_categories.json" destfile="selected_categories.json.gz" />
 		<replace file="index.html" token="{GMAPS_API}" value="${GOOGLE_MAPS_API}" />
 		<replace file="index.html" token="{4SQ_API}" value="${4SQ_API}" />
 		<replace file="index.html" token="{4SQ_API_SECRET}" value="${4SQ_API_SECRET}" />

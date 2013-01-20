@@ -147,7 +147,7 @@
          */
         retrieveCategories : function() {
             $.ajax({
-                        url : 'categories.json',
+                        url : 'selected_categories.json',
                         method : 'get',
                         type : 'json',
                         success : function(response) {
@@ -225,6 +225,7 @@
         },
 
         applyPreset : function(categories) {
+            for(var i = 0)
             return categories;
         },
 
@@ -243,7 +244,7 @@
                 html +=
                         '<li><label class="checkbox" for="category-checkbox-'
                                 + category.id
-                                + '"><input type="checkbox" id=category-checkbox-'
+                                + '"><input type="checkbox" id="category-checkbox-'
                                 + category.id + '"> ' + category.name
                                 + '</label>';
                 if (category.categories && category.categories.length !== 0) {
