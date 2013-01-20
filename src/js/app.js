@@ -372,16 +372,6 @@
         renderCategories : function(categories) {
             $('#categories-filter').html(this.renderCategoriesRaw(this
                     .applyPreset(categories)));
-            $('#categories-filter .tagManager').each(function(input) {
-                input = $(input);
-                input.tagsManager({
-                            prefilled : (input.data('genres') || '').split(','),
-                            preventSubmitOnEnter : true,
-                            typeahead : true,
-                            typeaheadAjaxSource : null,
-                            typeaheadSource : this.getGenres()
-                        });
-            }.bind(this));
         },
 
         /**
