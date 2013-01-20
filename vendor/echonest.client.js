@@ -143,7 +143,7 @@
         var Request = function() {
 
             // merge any extended api details together
-            this.extendedDetails = $.extend.apply(true, arguments);
+            this.extendedDetails = $.extend.apply({}, arguments);
 
             console.log(this.extendedDetails)
             
