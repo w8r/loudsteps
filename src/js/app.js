@@ -226,6 +226,13 @@
         bindEvents : function() {
             event.on(this.poiSource, 'categories_received',
                     this.renderCategories.bind(this));
+            event.on(this.router, 'route_updated', function(route) {
+                        var routless = !route;
+                        $('#explore-button').attr('disabled', routeless)[(routeless
+                                ? 'add'
+                                : 'remove')
+                                + 'Class']('disabled');
+                    });
             $('#explore-button').click(function() {
                 if (this.router.route) {
                     this.poiSource.explore(this.router.route.bounds, this
