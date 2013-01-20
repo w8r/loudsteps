@@ -304,6 +304,7 @@
             this.genres = genres;
             $('#categories-filter .tagManager').each(function(input) {
                 input = $(input);
+                console.log(input.previous());
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
@@ -402,7 +403,7 @@
                                 + '" checked="true"> '
                                 + category.name
                                 + '</label><div class="input-append">'
-                                + '<input type="text" class="tagManager genres" '
+                                + '<div></div><input type="text" class="tagManager genres" '
                                 + 'name="genres-' + category.id
                                 + '" data-provide="typeahead" '
                                 + 'data-genres="" autocomplete="off" />'
