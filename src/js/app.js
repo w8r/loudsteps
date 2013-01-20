@@ -416,25 +416,25 @@
             for (var i = 0, ii = categories.length; i < ii; i++) {
                 var category = categories[i];
                 html +=
-                        '<li><label class="checkbox" for="category-checkbox-'
-                                + category.id
-                                + '"><input type="checkbox" id="category-checkbox-'
-                                + category.id
-                                + '" checked="true"> '
-                                + category.name
-                                + '</label>'
+                        '<li>'
                                 + '<div class="pull-right">'
                                 + '<div></div><input type="text" class="tagManager genres hide" '
-                                + 'name="genres-' + category.id
+                                + 'name="genres-'
+                                + category.id
                                 + '" data-provide="typeahead" '
                                 + 'data-genres="" autocomplete="off" />'
                                 + '<span class="btn"><i class="icon icon-tag">'
-                                + '</i></span></div>';
+                                + '</i></span></div>'
+                                + '<label class="checkbox" for="category-checkbox-'
+                                + category.id
+                                + '"><input type="checkbox" id="category-checkbox-'
+                                + category.id + '" checked="true"> '
+                                + category.name + '</label>';
 
                 // if (category.categories && category.categories.length !== 0)
                 // {
                 // html += this.renderCategoriesRaw(category.categories);
-                //                }
+                // }
                 html += '</li>'
             }
             return (html + '</ul>');
