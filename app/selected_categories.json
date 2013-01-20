@@ -1,6 +1,6 @@
 {
     "response" : {
-        genres : ["art rock,avant-garde",
+        "genres" : ["art rock,avant-garde",
                 "neue deutsche harte,neo-progressive",
                 "traditional blues,folk rock,classical", "ambient,space rock",
                 "metalcore", "industrial,martial industrial", "", "noise rock",
