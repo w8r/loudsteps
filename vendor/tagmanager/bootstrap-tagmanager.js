@@ -132,7 +132,7 @@
 
             // remove from head
             for (var i = 0; i < l; i++) {
-                if (-1 == $.inArray(txt.charCodeAt(i), delimeters))
+                if (-1 == delimeters.indexOf(txt.charCodeAt(i)))
                     break;
                 t++;
             }
@@ -385,7 +385,7 @@
                 if (-1 != p) {
                     // user just entered a valid delimeter
                     var user_input = $(this).val(); // user_input =
-                                                    // $().inArray(delimeters[p]);
+                    // $().inArray(delimeters[p]);
                     user_input = trimTag(user_input);
                     pushTag(user_input, e.data);
                     // console.log("pushTag: keyup");
@@ -400,7 +400,7 @@
                             if (-1 != p) {
                                 // user just entered backspace or equivalent
                                 var user_input = $(this).val(); // user_input =
-                                                                // $().inArray(delimeters[p]);
+                                // $().inArray(delimeters[p]);
                                 var i = user_input.length;
                                 if (i <= 0) {
                                     // console.log("backspace detected");
@@ -458,7 +458,7 @@
                             // console.log('change: typeaheadIsVisible is NOT
                             // visible');
                             var user_input = $(this).val(); // user_input =
-                                                            // $().inArray(delimeters[p]);
+                            // $().inArray(delimeters[p]);
                             user_input = trimTag(user_input);
                             pushTag(user_input);
                             // console.log("pushTag: change ");
@@ -491,7 +491,7 @@
                             if (push) {
                                 // console.log('lost focus');
                                 var user_input = $(this).val(); // user_input =
-                                                                // $().inArray(delimeters[p]);
+                                // $().inArray(delimeters[p]);
                                 user_input = trimTag(user_input);
                                 pushTag(user_input);
                                 // console.log("pushTag: blur");
