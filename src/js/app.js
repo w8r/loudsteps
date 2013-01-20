@@ -149,8 +149,8 @@
     Foursquare.prototype = {
 
         markers : [],
-        
-        circles: [],
+
+        circles : [],
 
         /**
          * Retrieves categories cache
@@ -198,12 +198,27 @@
          *            data
          */
         putPOIs : function(data) {
-            var POIs = data.response.venues, marker, icon, poi, size, circle;
+            var POIs = data.response.venues, marker, icon, poi, size, circle, pos;
             this.clearPOIs();
             for (var i = 0, len = POIs.length; i < len; i++) {
                 poi = POIs[i];
                 icon = poi.categories[0].icon;
                 size = parseInt(icon.sizes[0]);
+                pos =
+                        new google.maps.LatLng(poi.location.lat,
+                                poi.location.lng);
+
+                circle = new google.maps.Circle({
+                            center : pos,
+                            radius : 50,
+                            strokeColor : '#11b6f7',
+                            fillColor : '#009bd9',
+                            fillOpacity : 0.2,
+                            strokeWeight : 0.5,
+                            map : this
+                        });
+                this.circles.push(circle);
+
                 marker = new google.maps.Marker({
                             map : this.map,
                             icon : {
@@ -214,12 +229,9 @@
                             },
                             visible : true,
                             title : poi.name,
-                            position : new google.maps.LatLng(poi.location.lat,
-                                    poi.location.lng)
+                            position : pos
                         });
                 this.markers.push(marker);
-                
-                circle = new google.maps.Circle({})
             }
         },
 
@@ -262,8 +274,8 @@
     };
 
     App.prototype = {
-        
-        constructor: App,
+
+        constructor : App,
 
         /**
          * Default zoom to init
