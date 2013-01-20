@@ -246,7 +246,13 @@
         this.client = new EchoNest(api_key);
     };
 
-    Echonest.prototype = {};
+    Echonest.prototype = {
+        getGenresList : function(callback) {
+            this.client.list_genres(function(response) {
+                        callback(response.data.genres);
+                    });
+        }
+    };
 
     /***************************************************************************
      * Main app
