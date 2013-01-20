@@ -299,7 +299,10 @@
                             preventSubmitOnEnter : true,
                             typeahead : true,
                             typeaheadAjaxSource : null,
-                            typeaheadSource : this.getGenres.bind(this)
+                            typeaheadSource : this.getGenres.bind(this),
+                            preventSubmitOnEnter : true,
+                            delimeters : [44, 188, 13],
+                            backspace : [8]
                         });
             }.bind(this));
         },
