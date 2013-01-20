@@ -304,7 +304,8 @@
             this.genres = genres;
             $('#categories-filter .tagManager').each(function(input) {
                 input = $(input);
-                console.log(input.previous()[0]);
+                var container = input.previous(),
+                    trigger = input.next();
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
@@ -316,7 +317,7 @@
                             preventSubmitOnEnter : true,
                             delimeters : [44, 188, 13],
                             backspace : [8],
-                            tagsContainer: input.previous(),
+                            tagsContainer : input.previous(),
                             tagClass : 'label label-info genre-tag',
                             tagCloseIcon : '&times'
                         });
