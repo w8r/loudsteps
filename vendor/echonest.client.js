@@ -140,13 +140,14 @@
         /**
          * Used to build a request to the API
          */
-        var Request = function() {
-console.log(arguments);
+        var Request = function(options) {
+            options = options || {};
+            console.log(arguments);
             // merge any extended api details together
             this.extendedDetails = $.extend.apply({}, arguments);
 
             console.log(this.extendedDetails)
-            
+
             function url() {
                 return _en.constants.endPoint + _en.constants.endPointVersion
                         + "/";
@@ -285,15 +286,16 @@ console.log(arguments);
              * @returns A collection object.
              */
             images : function(callback, options) {
-                options = options || {}
                 console.log(options, {
                             name : this.name
                         });
-                try{var request = new Request(options, {
-                            name : this.name
-                        });
-                }catch(e){
-                console.log(request, e);}
+                try {
+                    var request = new Request(options, {
+                                name : this.name
+                            });
+                } catch (e) {
+                    console.log(request, e);
+                }
                 request.get(this.endPoint + 'images', function(response) {
                             callback(new ImageCollection(response.getData()));
                         });
