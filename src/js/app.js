@@ -344,26 +344,27 @@
                     trigger = input.parent().find('.tags .btn');
 
                 trigger.click(function() {
-                            var btn = $(this),
-                                icon = btn.find('.icon');
-                            if (icon.hasClass('icon-tag')) {
-                                btn.removeClass('btn-mini');
-                                icon.removeClass('icon-tag')
-                                        .addClass('icon-chevron-left');
+                    var btn = $(this),
+                        icon = btn.find('.icon');
+                    if (icon.hasClass('icon-tag')) {
+                        btn.removeClass('btn-mini');
+                        icon.removeClass('icon-tag')
+                                .addClass('icon-chevron-left');
 
-                                input.parent().addClass('input-append')
-                                        .removeClass('pull-right');
+                        btn.append(input.parent().addClass('input-append')
+                                .removeClass('pull-right'));
 
-                                input.removeClass('hide');
-                            } else {
-                                btn.addClass('btn-mini');
-                                icon.addClass('icon-tag')
-                                        .removeClass('icon-chevron-left');
-                                input.parent().removeClass('input-append')
-                                        .addClass('pull-right');
-                                input.addClass('hide');
-                            }
-                        });
+                        input.removeClass('hide');
+                    } else {
+                        btn.addClass('btn-mini');
+                        icon.addClass('icon-tag')
+                                .removeClass('icon-chevron-left');
+                        btn.append(input.parent().removeClass('input-append')
+                                .addClass('pull-right').parent().find('.tags'));
+
+                        input.addClass('hide');
+                    }
+                });
                 input.click(function(evt) {
                             evt.stopPropagation();
                         }).tagsManager({
