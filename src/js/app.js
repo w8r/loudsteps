@@ -236,6 +236,7 @@
                         } else {
                             button.removeAttr(dis).removeClass(dis);
                         }
+                        console.log(button);
                     });
             $('#explore-button').click(function() {
                 if (this.router.route) {
